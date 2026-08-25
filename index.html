@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#111111">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Tip Check">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icon-180.png">
+  <title>Tip Check</title>
+  <style>
+    :root{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;color:#fff;background:#111}
+    *{box-sizing:border-box}
+    body{margin:0;background:#111;min-height:100vh}
+    .app{max-width:720px;margin:auto;padding:env(safe-area-inset-top) 16px calc(28px + env(safe-area-inset-bottom))}
+    header{padding:18px 4px 10px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+    h1{font-size:28px;margin:0}.sub{color:#a7a7ad;font-size:14px;margin-top:4px}
+    .card{background:#242426;border:1px solid #3b3b3e;border-radius:18px;padding:18px;margin:12px 0;box-shadow:0 8px 24px #0003}
+    .drop{border:2px dashed #5b5b60;border-radius:18px;min-height:220px;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;transition:.2s}
+    .drop.drag{border-color:#49d7c9;background:#19302e}
+    .drop strong{display:block;font-size:20px;margin-bottom:8px}
+    button{border:0;border-radius:14px;padding:14px 18px;font-size:16px;font-weight:700;background:#49d7c9;color:#071312}
+    button.secondary{background:#353538;color:#fff}
+    button.danger{background:#6e2b32;color:#fff}
+    button:disabled{opacity:.5}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+    .hidden{display:none!important}
+    .preview{width:100%;max-height:520px;object-fit:contain;border-radius:14px;background:#18181a}
+    .status{padding:14px;border-radius:14px;margin-top:12px;font-weight:700}
+    .yes{background:#193c25;color:#7df2a0}.no{background:#4a2427;color:#ff9ca5}
+    .unknown{background:#40371d;color:#ffd76d}.info{background:#193638;color:#7de8df}
+    .big{font-size:24px;margin:0 0 6px}.muted{color:#aaa}
+    .row{display:flex;justify-content:space-between;gap:12px;margin:8px 0}
+    .pill{padding:5px 9px;border-radius:999px;background:#38383b;font-size:12px}
+    input[type=file]{display:none}.filebtn{display:inline-block;cursor:pointer}
+    table{width:100%;border-collapse:collapse;font-size:13px}
+    td,th{text-align:left;padding:9px 5px;border-bottom:1px solid #3b3b3e}
+    .small{font-size:12px}.footer{color:#777;text-align:center;padding:12px;font-size:12px}
+    .debug{white-space:pre-wrap;background:#151517;border-radius:12px;padding:10px;margin-top:10px;color:#aaa}
+    dialog{background:#242426;color:#fff;border:1px solid #555;border-radius:18px;width:min(92vw,500px);padding:20px}
+    dialog::backdrop{background:#000b}
+    dialog input{width:100%;padding:13px;border-radius:12px;border:1px solid #555;background:#151517;color:#fff;font-size:16px}
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div><h1>Tip Check</h1><div class="sub">Previsão de tip antes de coletar</div></div>
+    <button class="secondary" id="dbBtn">Banco</button>
+  </header>
+
+  <section class="card">
+    <div id="drop" class="drop">
+      <div>
+        <strong>Arraste o print aqui</strong>
+        <div class="muted">ou selecione uma imagem da Fotos</div><br>
+        <label class="filebtn">
+          <input id="file" type="file" accept="image/*">
+          <span class="pill">Escolher print</span>
+        </label>
+      </div>
+    </div>
+  </section>
+
+  <section id="result" class="card hidden">
+    <img id="preview" class="preview" alt="Print selecionado">
+    <div id="ocrStatus" class="status info">Lendo o print…</div>
+    <div id="prediction"></div>
+    <div id="details" class="small muted"></div>
+    <details id="ocrDebug" class="small hidden">
+      <summary>Texto reconhecido (diagnóstico)</summary>
+      <div id="ocrText" class="debug"></div>
+    </details>
+    <div class="actions" style="margin-top:14px">
+      <button id="newBtn" class="secondary">Novo print</button>
+      <button id="learnBtn" class="secondary hidden">Corrigir / ensinar</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="row"><strong>Como funciona</strong><span class="pill" id="count">0 registros</span></div>
+    <div class="muted small">
+      O app não tenta ler a tip do print. Ele identifica o destino/endereço no histórico:
+      se já houver registros daquele destino, mostra a tendência. Se for novo, você informa
+      depois da coleta se houve tip e o app aprende.
+    </div>
+  </section>
+
+  <div class="footer">Dados armazenados neste iPhone. Nenhum print é enviado para um servidor por este app.</div>
+</div>
+
+<dialog id="dbDialog">
+  <h2>Banco de dados</h2>
+  <div id="dbList"></div>
+  <div class="actions" style="margin-top:16px">
+    <button id="exportBtn" class="secondary">Exportar backup</button>
+    <button id="importBtn" class="secondary">Importar</button>
+    <button id="clearBtn" class="danger">Apagar tudo</button>
+    <button id="closeDb" class="secondary">Fechar</button>
+  </div>
+  <input id="importFile" type="file" accept=".json,application/json" class="hidden">
+</dialog>
+
+<dialog id="learnDialog">
+  <h2>Nova entrega</h2>
+  <p class="muted">O print não mostra a tip antes da coleta. Depois de coletar, registre o resultado para o app aprender.</p>
+  <div id="learnText" class="small"></div>
+  <p><strong>Depois de coletar, teve tip?</strong></p>
+  <div class="actions">
+    <button id="tipYes">Sim, teve tip</button>
+    <button id="tipNo" class="danger">Não teve tip</button>
+  </div>
+</dialog>
+
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script>
+const DB_NAME='tip-check-db', STORE='records', DB_VERSION=2;
+let currentImage=null, currentKey=null, currentExtracted={};
+
+function dbOpen(){
+  return new Promise((res,rej)=>{
+    const r=indexedDB.open(DB_NAME,DB_VERSION);
+    r.onupgradeneeded=()=>{
+      const db=r.result;
+      if(!db.objectStoreNames.contains(STORE))
+        db.createObjectStore(STORE,{keyPath:'id',autoIncrement:true});
+    };
+    r.onsuccess=()=>res(r.result);
+    r.onerror=()=>rej(r.error);
+  });
+}
+async function allRecords(){
+  const db=await dbOpen();
+  return new Promise((res,rej)=>{
+    const tx=db.transaction(STORE,'readonly'), q=tx.objectStore(STORE).getAll();
+    q.onsuccess=()=>res(q.result); q.onerror=()=>rej(q.error);
+  });
+}
+async function addRecord(rec){
+  const db=await dbOpen();
+  return new Promise((res,rej)=>{
+    const tx=db.transaction(STORE,'readwrite');
+    tx.objectStore(STORE).add(rec);
+    tx.oncomplete=res; tx.onerror=()=>rej(tx.error);
+  });
+}
+async function clearRecords(){
+  const db=await dbOpen();
+  return new Promise((res,rej)=>{
+    const tx=db.transaction(STORE,'readwrite');
+    tx.objectStore(STORE).clear();
+    tx.oncomplete=res; tx.onerror=()=>rej(tx.error);
+  });
+}
+
+const norm=s=>(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+  .replace(/[^a-z0-9\s]/g,' ').replace(/\s+/g,' ').trim();
+
+function normalizeOcr(s){
+  return (s||'')
+    .replace(/[|]/g,'I')
+    .replace(/[“”"]/g,'')
+    .replace(/\r/g,'\n')
+    .replace(/[ \t]+/g,' ')
+    .replace(/\n{2,}/g,'\n')
+    .trim();
+}
+
+/* Aceita variações comuns do OCR em códigos Eircode, por exemplo:
+   D14Y265, D14 Y265, D14Y26S, D14Y2G5 etc. */
+function cleanPostcode(text){
+  const t=(text||'').toUpperCase().replace(/\s+/g,' ');
+  const m=t.match(/\b(D\s*\d{2}\s*[A-Z0-9]{3,4})\b/);
+  if(!m) return '';
+  return m[1].replace(/\s+/g,'');
+}
+
+function cleanAddressLine(s){
+  return (s||'')
+    .replace(/[|]/g,'I')
+    .replace(/\s+/g,' ')
+    .replace(/^[^A-Za-z0-9]+/,'')
+    .trim();
+}
+
+function extract(text){
+  const raw=normalizeOcr(text);
+  const lines=raw.split(/\n+/).map(x=>cleanAddressLine(x)).filter(Boolean);
+  const postcode=cleanPostcode(raw);
+
+  const roadWords=/\b(road|rd|avenue|ave|street|st|wood|manor|court|ct|lawn|green|park|way|drive|dr|close|crescent|grove|terrace|lane)\b/i;
+
+  // Primeiro procura uma linha que contenha número + nome de rua.
+  let address=lines.find(x=>/^\d{1,5}\s+[A-Za-zÀ-ÿ0-9' -]{3,}/.test(x) && roadWords.test(x)) || '';
+
+  // Se o OCR separou o postcode em outra linha, junta.
+  if(address && postcode && !address.toUpperCase().includes(postcode))
+    address += ', ' + postcode;
+
+  // Segunda tentativa: qualquer linha com número + palavra de rua.
+  if(!address)
+    address=lines.find(x=>/\b\d{1,5}\b/.test(x) && roadWords.test(x)) || '';
+
+  // Terceira tentativa: procura no texto inteiro uma sequência de endereço.
+  if(!address){
+    const m=raw.match(/\b\d{1,5}\s+[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ0-9' -]{3,60}\b(?:road|rd|avenue|ave|street|st|wood|manor|court|ct|lawn|green|park|way|drive|dr|close|crescent|grove|terrace|lane)\b(?:[^\n]*)/i);
+    if(m) address=cleanAddressLine(m[0]);
+  }
+
+  if(postcode && address && !address.toUpperCase().includes(postcode))
+    address += ', ' + postcode;
+
+  const name=lines.find(x=>
+    /^[A-ZÀ-Ý][A-Za-zÀ-ÿ' -]{3,40}$/.test(x) &&
+    !/^(Go to customer|Delivery complete|Deliver order|Collect order|Tip Check|Travel)$/i.test(x)
+  ) || '';
+
+  return {name,address,postcode,raw};
+}
+
+function keyFor(e){
+  // O postcode é a chave principal: é muito mais estável que o nome do cliente.
+  if(e.postcode) return 'pc:'+norm(e.postcode);
+  if(e.address) return 'addr:'+norm(e.address);
+  return '';
+}
+
+async function predict(key,e){
+  if(!key) return {type:'unknown',hits:[]};
+  const rs=await allRecords();
+  const hits=rs.filter(r=>r.key===key);
+  if(!hits.length) return {type:'unknown',hits:[]};
+  const yes=hits.filter(r=>r.tip===true).length;
+  const no=hits.filter(r=>r.tip===false).length;
+  if(yes && no) return {type:'mixed',yes,no,hits};
+  return {type:yes?'yes':'no',yes,no,hits};
+}
+
+function showPrediction(p,e){
+  const box=document.getElementById('prediction');
+  if(p.type==='yes'){
+    box.innerHTML=`<div class="status yes"><div class="big">💶 PROVÁVEL: TEM TIP</div>Histórico: ${p.yes} ocorrência(s) com tip.</div>`;
+  }else if(p.type==='no'){
+    box.innerHTML=`<div class="status no"><div class="big">SEM TIP NO HISTÓRICO</div>Histórico: ${p.no} ocorrência(s) sem tip.</div>`;
+  }else if(p.type==='mixed'){
+    box.innerHTML=`<div class="status unknown"><div class="big">⚠️ HISTÓRICO INCONSISTENTE</div>${p.yes} com tip e ${p.no} sem tip. Não dá para afirmar com segurança.</div>`;
+  }else{
+    box.innerHTML=`<div class="status unknown"><div class="big">❓ DESTINO NOVO</div>${e.address||e.postcode?'O endereço foi lido, mas ainda não há histórico.':'Não consegui identificar o destino. Você pode corrigir/ensinar manualmente.'}</div>`;
+  }
+
+  document.getElementById('details').textContent =
+    `Destino reconhecido: ${e.address||'não identificado'} ${e.postcode||''}` +
+    (e.name?` · Cliente: ${e.name}`:'');
+
+  document.getElementById('learnBtn').classList.remove('hidden');
+}
+
+function openLearn(){
+  document.getElementById('learnText').textContent =
+    `${currentExtracted.address||'Destino não identificado'} ${currentExtracted.postcode||''}`.trim();
+  document.getElementById('learnDialog').showModal();
+}
+
+async function learn(tip){
+  if(!currentKey){
+    alert('Não foi possível identificar o destino. Use um print mais nítido ou ensine o endereço manualmente.');
+    return;
+  }
+  await addRecord({
+    key:currentKey,
+    name:currentExtracted.name,
+    address:currentExtracted.address,
+    postcode:currentExtracted.postcode,
+    tip:!!tip,
+    date:new Date().toISOString()
+  });
+  document.getElementById('learnDialog').close();
+  const p=await predict(currentKey,currentExtracted);
+  showPrediction(p,currentExtracted);
+  updateCount();
+}
+
+function updateCount(){
+  allRecords().then(r=>{
+    document.getElementById('count').textContent=`${r.length} registro${r.length===1?'':'s'}`;
+  });
+}
+
+/* Pré-processamento para aumentar a taxa de acerto do OCR no iPhone.
+   O print é ampliado e convertido para escala de cinza/alto contraste. */
+async function preprocess(file, mode='full'){
+  const bitmap=await createImageBitmap(file);
+  const scale=2.4;
+  const canvas=document.createElement('canvas');
+  const ctx=canvas.getContext('2d',{willReadFrequently:true});
+
+  let sx=0, sy=0, sw=bitmap.width, sh=bitmap.height;
+  if(mode==='lower'){
+    sy=Math.floor(bitmap.height*0.45);
+    sh=Math.floor(bitmap.height*0.55);
+  }else if(mode==='middle'){
+    sy=Math.floor(bitmap.height*0.25);
+    sh=Math.floor(bitmap.height*0.65);
+  }
+
+  canvas.width=Math.min(Math.floor(sw*scale),3200);
+  canvas.height=Math.min(Math.floor(sh*scale),4200);
+  ctx.drawImage(bitmap,sx,sy,sw,sh,0,0,canvas.width,canvas.height);
+
+  const data=ctx.getImageData(0,0,canvas.width,canvas.height);
+  for(let i=0;i<data.data.length;i+=4){
+    const r=data.data[i],g=data.data[i+1],b=data.data[i+2];
+    let v=0.299*r+0.587*g+0.114*b;
+    // leve aumento de contraste sem destruir letras claras.
+    v=(v-128)*1.35+128;
+    v=Math.max(0,Math.min(255,v));
+    data.data[i]=data.data[i+1]=data.data[i+2]=v;
+  }
+  ctx.putImageData(data,0,0);
+  return canvas;
+}
+
+async function ocrPass(image, label){
+  const result=await Tesseract.recognize(image,'eng',{
+    logger:m=>{
+      if(m.status==='recognizing text'){
+        const pct=Math.round((m.progress||0)*100);
+        document.getElementById('ocrStatus').textContent=`Lendo o print… ${label} ${pct}%`;
+      }
+    }
+  });
+  return result.data.text||'';
+}
+
+async function process(file){
+  if(!file || !file.type.startsWith('image/')) return;
+
+  currentImage=file;
+  currentKey=null;
+  currentExtracted={};
+  document.getElementById('result').classList.remove('hidden');
+  document.getElementById('prediction').innerHTML='';
+  document.getElementById('details').textContent='';
+  document.getElementById('learnBtn').classList.add('hidden');
+  document.getElementById('ocrDebug').classList.add('hidden');
+
+  const img=document.getElementById('preview');
+  img.src=URL.createObjectURL(file);
+
+  const st=document.getElementById('ocrStatus');
+  st.textContent='Preparando OCR…';
+
+  try{
+    // Três passagens: imagem inteira, região central/inferior e região inferior.
+    // Isso é especialmente útil para o cartão "Go to customer".
+    const full=await preprocess(file,'full');
+    const middle=await preprocess(file,'middle');
+    const lower=await preprocess(file,'lower');
+
+    const texts=[];
+    texts.push(await ocrPass(full,'(1/3)'));
+    texts.push(await ocrPass(middle,'(2/3)'));
+    texts.push(await ocrPass(lower,'(3/3)'));
+
+    const text=texts.join('\n');
+    currentExtracted=extract(text);
+    currentKey=keyFor(currentExtracted);
+
+    document.getElementById('ocrText').textContent=text || '(nenhum texto reconhecido)';
+    document.getElementById('ocrDebug').classList.remove('hidden');
+
+    st.textContent='Print lido. Consultando banco local…';
+
+    const p=await predict(currentKey,currentExtracted);
+    showPrediction(p,currentExtracted);
+
+    if(p.type==='unknown') openLearn();
+  }catch(err){
+    console.error(err);
+    st.textContent='Não consegui ler o print automaticamente. Tente um print original, sem recorte e com boa resolução.';
+  }
+}
+
+document.getElementById('file').onchange=e=>{
+  if(e.target.files[0]) process(e.target.files[0]);
+};
+
+const drop=document.getElementById('drop');
+['dragenter','dragover'].forEach(x=>drop.addEventListener(x,e=>{
+  e.preventDefault(); drop.classList.add('drag');
+}));
+['dragleave','drop'].forEach(x=>drop.addEventListener(x,e=>{
+  e.preventDefault(); drop.classList.remove('drag');
+}));
+drop.addEventListener('drop',e=>{
+  const f=e.dataTransfer.files[0];
+  if(f&&f.type.startsWith('image/')) process(f);
+});
+
+document.getElementById('newBtn').onclick=()=>{
+  document.getElementById('result').classList.add('hidden');
+  document.getElementById('file').value='';
+  currentKey=null;
+  currentExtracted={};
+};
+
+document.getElementById('learnBtn').onclick=openLearn;
+document.getElementById('tipYes').onclick=()=>learn(true);
+document.getElementById('tipNo').onclick=()=>learn(false);
+
+async function renderDb(){
+  const rs=await allRecords();
+  const el=document.getElementById('dbList');
+  if(!rs.length){
+    el.innerHTML='<p class="muted">Banco vazio.</p>';
+    return;
+  }
+  el.innerHTML='<table><thead><tr><th>Destino</th><th>Tip</th><th>Data</th></tr></thead><tbody>'+
+    rs.slice().reverse().map(r=>
+      `<tr><td>${(r.address||r.postcode||'—').replace(/</g,'&lt;')}</td>`+
+      `<td>${r.tip?'SIM':'NÃO'}</td>`+
+      `<td>${new Date(r.date).toLocaleDateString('pt-BR')}</td></tr>`
+    ).join('')+
+    '</tbody></table>';
+}
+
+document.getElementById('dbBtn').onclick=()=>{
+  renderDb();
+  document.getElementById('dbDialog').showModal();
+};
+document.getElementById('closeDb').onclick=()=>document.getElementById('dbDialog').close();
+
+document.getElementById('exportBtn').onclick=async()=>{
+  const blob=new Blob([JSON.stringify(await allRecords(),null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='tip-check-backup.json';
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+};
+
+document.getElementById('importBtn').onclick=()=>document.getElementById('importFile').click();
+
+document.getElementById('importFile').onchange=async e=>{
+  try{
+    const f=e.target.files[0];
+    if(!f)return;
+    const rs=JSON.parse(await f.text());
+    if(!Array.isArray(rs)) throw new Error('Backup inválido');
+    await clearRecords();
+    for(const r of rs){
+      const copy={...r};
+      delete copy.id;
+      await addRecord(copy);
+    }
+    renderDb();
+    updateCount();
+  }catch(err){
+    alert('Não foi possível importar este backup.');
+    console.error(err);
+  }finally{
+    e.target.value='';
+  }
+};
+
+document.getElementById('clearBtn').onclick=async()=>{
+  if(confirm('Apagar todos os registros?')){
+    await clearRecords();
+    renderDb();
+    updateCount();
+  }
+};
+
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./sw.js').catch(console.error);
+}
+updateCount();
+</script>
+</body>
+</html>

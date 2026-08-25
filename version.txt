@@ -1,1 +1,2 @@
-Tip Checker PWA v2.0
+3.0.0
+OCR: multi-pass + preprocessamento + reconhecimento de Eircode
