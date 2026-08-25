@@ -1,375 +1,742 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#111111">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Tip Check">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icon-180.png">
-<title>Tip Check</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#111111">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Tip Check">
 
-<style>
-:root{
-  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif;
-  color:#fff;background:#111
-}
-*{box-sizing:border-box}
-body{margin:0;background:#111;min-height:100vh}
-.app{
-  max-width:720px;
-  margin:auto;
-  padding:env(safe-area-inset-top) 16px calc(28px + env(safe-area-inset-bottom))
-}
-header{
-  padding:18px 4px 10px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:12px
-}
-h1{font-size:28px;margin:0}
-.sub{color:#a7a7ad;font-size:14px;margin-top:4px}
-.card{
-  background:#242426;
-  border:1px solid #3b3b3e;
-  border-radius:18px;
-  padding:18px;
-  margin:12px 0;
-  box-shadow:0 8px 24px #0003
-}
-.drop{
-  border:2px dashed #5b5b60;
-  border-radius:18px;
-  min-height:220px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  padding:24px;
-  transition:.2s
-}
-.drop.drag{
-  border-color:#49d7c9;
-  background:#19302e
-}
-.drop strong{
-  display:block;
-  font-size:20px;
-  margin-bottom:8px
-}
-button{
-  border:0;
-  border-radius:14px;
-  padding:14px 18px;
-  font-size:16px;
-  font-weight:700;
-  background:#49d7c9;
-  color:#071312
-}
-button.secondary{background:#353538;color:#fff}
-button.danger{background:#6e2b32;color:#fff}
-button:disabled{opacity:.5}
-.actions{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  justify-content:center
-}
-.hidden{display:none!important}
-.preview{
-  width:100%;
-  max-height:520px;
-  object-fit:contain;
-  border-radius:14px;
-  background:#18181a
-}
-.status{
-  padding:14px;
-  border-radius:14px;
-  margin-top:12px;
-  font-weight:700
-}
-.yes{background:#193c25;color:#7df2a0}
-.no{background:#4a2427;color:#ff9ca5}
-.unknown{background:#40371d;color:#ffd76d}
-.info{background:#193638;color:#7de8df}
-.big{font-size:24px;margin:0 0 6px}
-.muted{color:#aaa}
-.row{
-  display:flex;
-  justify-content:space-between;
-  gap:12px;
-  margin:8px 0
-}
-.pill{
-  padding:5px 9px;
-  border-radius:999px;
-  background:#38383b;
-  font-size:12px
-}
-input[type=file]{display:none}
-.filebtn{display:inline-block;cursor:pointer}
-table{
-  width:100%;
-  border-collapse:collapse;
-  font-size:13px
-}
-td,th{
-  text-align:left;
-  padding:9px 5px;
-  border-bottom:1px solid #3b3b3e
-}
-.small{font-size:12px}
-.footer{
-  color:#777;
-  text-align:center;
-  padding:12px;
-  font-size:12px
-}
-.debug{
-  white-space:pre-wrap;
-  background:#151517;
-  border-radius:12px;
-  padding:10px;
-  margin-top:10px;
-  color:#aaa
-}
-dialog{
-  background:#242426;
-  color:#fff;
-  border:1px solid #555;
-  border-radius:18px;
-  width:min(92vw,500px);
-  padding:20px
-}
-dialog::backdrop{background:#000b}
-dialog input{
-  width:100%;
-  padding:13px;
-  border-radius:12px;
-  border:1px solid #555;
-  background:#151517;
-  color:#fff;
-  font-size:16px
-}
-.addressBox{
-  background:#303033;
-  border-radius:12px;
-  padding:12px;
-  margin-top:10px;
-}
-.addressBox strong{color:#7de8df}
-.warning{
-  background:#4a3520;
-  color:#ffd76d;
-  padding:12px;
-  border-radius:12px;
-  margin-top:10px
-}
-</style>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icon-180.png">
+
+  <title>Tip Check</title>
+
+  <style>
+    :root{
+      font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display",
+      "Segoe UI",sans-serif;
+      color:#fff;
+      background:#111;
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      background:#111;
+      min-height:100vh;
+    }
+
+    .app{
+      max-width:720px;
+      margin:auto;
+      padding:
+        env(safe-area-inset-top)
+        16px
+        calc(28px + env(safe-area-inset-bottom));
+    }
+
+    header{
+      padding:18px 4px 10px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+    }
+
+    h1{
+      font-size:28px;
+      margin:0;
+    }
+
+    .sub{
+      color:#a7a7ad;
+      font-size:14px;
+      margin-top:4px;
+    }
+
+    .card{
+      background:#242426;
+      border:1px solid #3b3b3e;
+      border-radius:18px;
+      padding:18px;
+      margin:12px 0;
+      box-shadow:0 8px 24px #0003;
+    }
+
+    .drop{
+      border:2px dashed #5b5b60;
+      border-radius:18px;
+      min-height:220px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      padding:24px;
+      transition:.2s;
+    }
+
+    .drop.drag{
+      border-color:#49d7c9;
+      background:#19302e;
+    }
+
+    .drop strong{
+      display:block;
+      font-size:20px;
+      margin-bottom:8px;
+    }
+
+    button{
+      border:0;
+      border-radius:14px;
+      padding:14px 18px;
+      font-size:16px;
+      font-weight:700;
+      background:#49d7c9;
+      color:#071312;
+    }
+
+    button.secondary{
+      background:#353538;
+      color:#fff;
+    }
+
+    button.danger{
+      background:#6e2b32;
+      color:#fff;
+    }
+
+    button:disabled{
+      opacity:.5;
+    }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:center;
+    }
+
+    .hidden{
+      display:none!important;
+    }
+
+    .preview{
+      width:100%;
+      max-height:520px;
+      object-fit:contain;
+      border-radius:14px;
+      background:#18181a;
+    }
+
+    .status{
+      padding:14px;
+      border-radius:14px;
+      margin-top:12px;
+      font-weight:700;
+    }
+
+    .yes{
+      background:#193c25;
+      color:#7df2a0;
+    }
+
+    .no{
+      background:#4a2427;
+      color:#ff9ca5;
+    }
+
+    .unknown{
+      background:#40371d;
+      color:#ffd76d;
+    }
+
+    .info{
+      background:#193638;
+      color:#7de8df;
+    }
+
+    .warning{
+      background:#49391a;
+      color:#ffd86a;
+    }
+
+    .big{
+      font-size:24px;
+      margin:0 0 6px;
+    }
+
+    .muted{
+      color:#aaa;
+    }
+
+    .row{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      margin:8px 0;
+    }
+
+    .pill{
+      padding:5px 9px;
+      border-radius:999px;
+      background:#38383b;
+      font-size:12px;
+    }
+
+    input[type=file]{
+      display:none;
+    }
+
+    .filebtn{
+      display:inline-block;
+      cursor:pointer;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      font-size:13px;
+    }
+
+    td,th{
+      text-align:left;
+      padding:9px 5px;
+      border-bottom:1px solid #3b3b3e;
+    }
+
+    .small{
+      font-size:12px;
+    }
+
+    .footer{
+      color:#777;
+      text-align:center;
+      padding:12px;
+      font-size:12px;
+    }
+
+    .debug{
+      white-space:pre-wrap;
+      background:#151517;
+      border-radius:12px;
+      padding:10px;
+      margin-top:10px;
+      color:#aaa;
+      max-height:300px;
+      overflow:auto;
+    }
+
+    dialog{
+      background:#242426;
+      color:#fff;
+      border:1px solid #555;
+      border-radius:18px;
+      width:min(92vw,500px);
+      padding:20px;
+    }
+
+    dialog::backdrop{
+      background:#000b;
+    }
+
+    dialog input[type=text]{
+      width:100%;
+      padding:13px;
+      border-radius:12px;
+      border:1px solid #555;
+      background:#151517;
+      color:#fff;
+      font-size:16px;
+      margin:6px 0;
+    }
+
+    .confidence{
+      font-size:12px;
+      color:#aaa;
+      margin-top:8px;
+    }
+  </style>
 </head>
 
 <body>
+
 <div class="app">
 
-<header>
-  <div>
-    <h1>Tip Check</h1>
-    <div class="sub">Previsão de tip antes de coletar</div>
-  </div>
-  <button class="secondary" id="dbBtn">Banco</button>
-</header>
-
-<section class="card">
-  <div id="drop" class="drop">
+  <header>
     <div>
-      <strong>Arraste o print aqui</strong>
-      <div class="muted">ou selecione uma imagem da Fotos</div>
-      <br>
-      <label class="filebtn">
-        <input id="file" type="file" accept="image/*">
-        <span class="pill">Escolher print</span>
-      </label>
+      <h1>Tip Check</h1>
+      <div class="sub">Previsão de tip antes de coletar</div>
     </div>
+
+    <button class="secondary" id="dbBtn">
+      Banco
+    </button>
+  </header>
+
+
+  <!-- UPLOAD -->
+
+  <section class="card">
+
+    <div id="drop" class="drop">
+
+      <div>
+
+        <strong>Arraste o print aqui</strong>
+
+        <div class="muted">
+          ou selecione uma imagem da Fotos
+        </div>
+
+        <br>
+
+        <label class="filebtn">
+
+          <input
+            id="file"
+            type="file"
+            accept="image/*"
+          >
+
+          <span class="pill">
+            Escolher print
+          </span>
+
+        </label>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- RESULTADO -->
+
+  <section id="result" class="card hidden">
+
+    <img
+      id="preview"
+      class="preview"
+      alt="Print selecionado"
+    >
+
+    <div
+      id="ocrStatus"
+      class="status info"
+    >
+      Preparando OCR…
+    </div>
+
+    <div id="prediction"></div>
+
+    <div
+      id="details"
+      class="small muted"
+    ></div>
+
+    <div
+      id="warning"
+      class="status warning hidden"
+    ></div>
+
+    <details
+      id="ocrDebug"
+      class="small hidden"
+    >
+
+      <summary>
+        Texto reconhecido (diagnóstico)
+      </summary>
+
+      <div
+        id="ocrText"
+        class="debug"
+      ></div>
+
+    </details>
+
+    <div
+      class="actions"
+      style="margin-top:14px"
+    >
+
+      <button
+        id="newBtn"
+        class="secondary"
+      >
+        Novo print
+      </button>
+
+      <button
+        id="learnBtn"
+        class="secondary hidden"
+      >
+        Corrigir / ensinar
+      </button>
+
+    </div>
+
+  </section>
+
+
+  <!-- COMO FUNCIONA -->
+
+  <section class="card">
+
+    <div class="row">
+
+      <strong>
+        Como funciona
+      </strong>
+
+      <span
+        class="pill"
+        id="count"
+      >
+        0 registros
+      </span>
+
+    </div>
+
+    <div class="muted small">
+
+      O app não tenta ler a tip do print.
+
+      Ele procura primeiro o Eircode do cliente,
+      porque ele é a identificação mais confiável
+      do destino.
+
+      Textos do mapa, como parques, bairros,
+      nomes de estradas e pontos de interesse,
+      são ignorados.
+
+      Quando o destino é novo, você informa
+      depois da coleta se houve tip e o app aprende.
+
+    </div>
+
+  </section>
+
+
+  <div class="footer">
+    Dados armazenados neste iPhone.
+    Nenhum print é enviado para um servidor por este app.
   </div>
-</section>
 
-<section id="result" class="card hidden">
-
-  <img id="preview" class="preview" alt="Print selecionado">
-
-  <div id="ocrStatus" class="status info">
-    Lendo o print…
-  </div>
-
-  <div id="prediction"></div>
-
-  <div id="details" class="small muted"></div>
-
-  <div id="addressCandidates"></div>
-
-  <details id="ocrDebug" class="small hidden">
-    <summary>Texto reconhecido (diagnóstico)</summary>
-    <div id="ocrText" class="debug"></div>
-  </details>
-
-  <div class="actions" style="margin-top:14px">
-    <button id="newBtn" class="secondary">Novo print</button>
-    <button id="learnBtn" class="secondary hidden">Corrigir / ensinar</button>
-  </div>
-
-</section>
-
-<section class="card">
-  <div class="row">
-    <strong>Como funciona</strong>
-    <span class="pill" id="count">0 registros</span>
-  </div>
-
-  <div class="muted small">
-    O app não tenta ler a tip do print.
-    Ele identifica o endereço do cliente e procura esse endereço no histórico.
-    Quando o print contém restaurante e cliente, tenta separar os dois e usar
-    o destino do cliente.
-  </div>
-</section>
-
-<div class="footer">
-  Dados armazenados neste iPhone. Nenhum print é enviado para um servidor por este app.
 </div>
 
-</div>
+
+<!-- BANCO -->
 
 <dialog id="dbDialog">
-  <h2>Banco de dados</h2>
+
+  <h2>
+    Banco de dados
+  </h2>
 
   <div id="dbList"></div>
 
-  <div class="actions" style="margin-top:16px">
-    <button id="exportBtn" class="secondary">Exportar backup</button>
-    <button id="importBtn" class="secondary">Importar</button>
-    <button id="clearBtn" class="danger">Apagar tudo</button>
-    <button id="closeDb" class="secondary">Fechar</button>
+  <div
+    class="actions"
+    style="margin-top:16px"
+  >
+
+    <button
+      id="exportBtn"
+      class="secondary"
+    >
+      Exportar backup
+    </button>
+
+    <button
+      id="importBtn"
+      class="secondary"
+    >
+      Importar
+    </button>
+
+    <button
+      id="clearBtn"
+      class="danger"
+    >
+      Apagar tudo
+    </button>
+
+    <button
+      id="closeDb"
+      class="secondary"
+    >
+      Fechar
+    </button>
+
   </div>
 
   <input
     id="importFile"
     type="file"
     accept=".json,application/json"
-    class="hidden">
+    class="hidden"
+  >
+
 </dialog>
+
+
+<!-- ENSINAR -->
 
 <dialog id="learnDialog">
 
-  <h2>Nova entrega</h2>
+  <h2>
+    Nova entrega
+  </h2>
 
   <p class="muted">
+
     O print não mostra a tip antes da coleta.
-    Depois de coletar, registre o resultado para o app aprender.
+    Depois de coletar, registre o resultado
+    para o app aprender.
+
   </p>
 
-  <div id="learnText" class="small"></div>
+  <div
+    id="learnText"
+    class="small"
+  ></div>
 
   <p>
-    <strong>Depois de coletar, teve tip?</strong>
+    <strong>
+      Depois de coletar, teve tip?
+    </strong>
   </p>
 
   <div class="actions">
-    <button id="tipYes">Sim, teve tip</button>
-    <button id="tipNo" class="danger">Não teve tip</button>
+
+    <button id="tipYes">
+      Sim, teve tip
+    </button>
+
+    <button
+      id="tipNo"
+      class="danger"
+    >
+      Não teve tip
+    </button>
+
   </div>
 
 </dialog>
+
+
+<!-- CORREÇÃO MANUAL -->
+
+<dialog id="manualDialog">
+
+  <h2>
+    Corrigir destino
+  </h2>
+
+  <p class="muted small">
+
+    Se o OCR não identificou corretamente
+    o endereço do cliente, coloque aqui
+    o endereço/Eircode do destino.
+
+  </p>
+
+  <label class="small">
+    Endereço do cliente
+  </label>
+
+  <input
+    id="manualAddress"
+    type="text"
+    placeholder="Ex.: Garters Lane, Saggart"
+  >
+
+  <label class="small">
+    Eircode
+  </label>
+
+  <input
+    id="manualPostcode"
+    type="text"
+    placeholder="Ex.: D24Y928"
+  >
+
+  <div
+    class="actions"
+    style="margin-top:14px"
+  >
+
+    <button
+      id="manualSave"
+    >
+      Salvar destino
+    </button>
+
+    <button
+      id="manualCancel"
+      class="secondary"
+    >
+      Cancelar
+    </button>
+
+  </div>
+
+</dialog>
+
 
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
 <script>
 
-const DB_NAME='tip-check-db';
-const STORE='records';
-const DB_VERSION=3;
+/* =========================================================
+   CONFIGURAÇÃO
+========================================================= */
 
-let currentImage=null;
-let currentKey=null;
-let currentExtracted={};
+const DB_NAME = 'tip-check-db';
+const STORE = 'records';
+const DB_VERSION = 3;
+
+let currentImage = null;
+let currentKey = null;
+let currentExtracted = {};
+
+
+/* =========================================================
+   BANCO INDEXEDDB
+========================================================= */
 
 function dbOpen(){
 
   return new Promise((resolve,reject)=>{
 
-    const request=indexedDB.open(DB_NAME,DB_VERSION);
+    const request =
+      indexedDB.open(
+        DB_NAME,
+        DB_VERSION
+      );
 
-    request.onupgradeneeded=()=>{
+    request.onupgradeneeded = ()=>{
 
-      const db=request.result;
+      const db = request.result;
 
       if(!db.objectStoreNames.contains(STORE)){
-        db.createObjectStore(STORE,{
-          keyPath:'id',
-          autoIncrement:true
-        });
+
+        db.createObjectStore(
+          STORE,
+          {
+            keyPath:'id',
+            autoIncrement:true
+          }
+        );
+
       }
+
     };
 
-    request.onsuccess=()=>resolve(request.result);
-    request.onerror=()=>reject(request.error);
+    request.onsuccess = ()=>{
+      resolve(request.result);
+    };
+
+    request.onerror = ()=>{
+      reject(request.error);
+    };
 
   });
+
 }
+
 
 async function allRecords(){
 
-  const db=await dbOpen();
+  const db = await dbOpen();
 
   return new Promise((resolve,reject)=>{
 
-    const tx=db.transaction(STORE,'readonly');
-    const q=tx.objectStore(STORE).getAll();
+    const tx =
+      db.transaction(
+        STORE,
+        'readonly'
+      );
 
-    q.onsuccess=()=>resolve(q.result);
-    q.onerror=()=>reject(q.error);
+    const request =
+      tx.objectStore(STORE).getAll();
+
+    request.onsuccess = ()=>{
+      resolve(request.result);
+    };
+
+    request.onerror = ()=>{
+      reject(request.error);
+    };
 
   });
+
 }
+
 
 async function addRecord(record){
 
-  const db=await dbOpen();
+  const db = await dbOpen();
 
   return new Promise((resolve,reject)=>{
 
-    const tx=db.transaction(STORE,'readwrite');
+    const tx =
+      db.transaction(
+        STORE,
+        'readwrite'
+      );
 
     tx.objectStore(STORE).add(record);
 
-    tx.oncomplete=resolve;
-    tx.onerror=()=>reject(tx.error);
+    tx.oncomplete = resolve;
+
+    tx.onerror = ()=>{
+      reject(tx.error);
+    };
 
   });
+
 }
+
 
 async function clearRecords(){
 
-  const db=await dbOpen();
+  const db = await dbOpen();
 
   return new Promise((resolve,reject)=>{
 
-    const tx=db.transaction(STORE,'readwrite');
+    const tx =
+      db.transaction(
+        STORE,
+        'readwrite'
+      );
 
     tx.objectStore(STORE).clear();
 
-    tx.oncomplete=resolve;
-    tx.onerror=()=>reject(tx.error);
+    tx.oncomplete = resolve;
+
+    tx.onerror = ()=>{
+      reject(tx.error);
+    };
 
   });
+
 }
+
+
+/* =========================================================
+   NORMALIZAÇÃO
+========================================================= */
 
 function norm(text){
 
-  return (text||'')
+  return (text || '')
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g,'')
@@ -379,10 +746,10 @@ function norm(text){
 
 }
 
+
 function normalizeOcr(text){
 
-  return (text||'')
-    .replace(/[|]/g,'I')
+  return (text || '')
     .replace(/[“”"]/g,'')
     .replace(/\r/g,'\n')
     .replace(/[ \t]+/g,' ')
@@ -391,378 +758,679 @@ function normalizeOcr(text){
 
 }
 
-/*
-  Eircode:
-  D14Y265
-  D14 Y265
-  D04F344
-  D04 F344
-*/
-
-function findPostcodes(text){
-
-  const clean=(text||'')
-    .toUpperCase()
-    .replace(/[^A-Z0-9\s]/g,' ');
-
-  const matches=
-    clean.match(/\bD\s*\d{2}\s*[A-Z0-9]{3}\b/g) || [];
-
-  return [...new Set(
-    matches.map(x=>x.replace(/\s+/g,''))
-  )];
-
-}
 
 function cleanLine(text){
 
-  return (text||'')
+  return (text || '')
     .replace(/[|]/g,'I')
+    .replace(/[<>«»←→]/g,' ')
     .replace(/\s+/g,' ')
     .replace(/^[^A-Za-z0-9]+/,'')
     .trim();
 
 }
 
-/*
-  Detecta endereços.
 
-  Importante:
-  O print pode conter:
+/* =========================================================
+   EIRCODE
+=========================================================
 
-  RESTAURANTE
-  34 Camden Street Upper
+   Formato normal:
 
-  ↓
+   D24 Y928
+   D24Y928
 
-  CLIENTE
-  Garters Lane, Saggart...
-  D24Y928
+   A65 F4E2
+   A65F4E2
 
-  Portanto NÃO usamos simplesmente
-  "o primeiro endereço encontrado".
+   etc.
 
-  Procuramos todos e depois damos prioridade
-  ao endereço associado ao último Eircode.
-*/
+========================================================= */
 
-function extractAddresses(text){
+function findEircodes(text){
 
-  const raw=normalizeOcr(text);
+  const upper =
+    (text || '')
+      .toUpperCase()
+      .replace(/[^A-Z0-9\s]/g,' ');
 
-  const lines=raw
-    .split(/\n+/)
-    .map(cleanLine)
-    .filter(Boolean);
+  const results = [];
 
-  const roadWords=
-    /\b(road|rd|avenue|ave|street|st|wood|manor|court|ct|lawn|green|park|way|drive|dr|close|crescent|grove|terrace|lane|gardens|garden|square|place|hill|view)\b/i;
+  /*
+    Routing key:
+    1 letra + 2 números
 
-  const postcodes=findPostcodes(raw);
+    Espaço opcional
 
-  const candidates=[];
+    4 caracteres
+  */
 
-  for(let i=0;i<lines.length;i++){
+  const regex =
+    /\b([A-Z]\s*\d{2})\s*([A-Z0-9]{4})\b/g;
 
-    const line=lines[i];
+  let match;
 
-    const hasNumber=/\b\d{1,5}\b/.test(line);
-    const hasRoad=roadWords.test(line);
-    const hasPostcode=/\bD\s*\d{2}\s*[A-Z0-9]{3}\b/i.test(line);
+  while((match = regex.exec(upper)) !== null){
 
-    if(hasNumber && (hasRoad || hasPostcode)){
+    const code =
+      (match[1] + match[2])
+        .replace(/\s+/g,'');
 
-      let address=line;
-
-      if(i+1<lines.length){
-
-        const next=lines[i+1];
-
-        if(
-          /\bD\s*\d{2}\s*[A-Z0-9]{3}\b/i.test(next) ||
-          roadWords.test(next)
-        ){
-
-          address+=' '+next;
-        }
-      }
-
-      candidates.push({
-        address:cleanLine(address),
-        lineIndex:i
-      });
-
+    if(!results.includes(code)){
+      results.push(code);
     }
 
   }
 
-  /*
-    Também procura linhas sem número, como:
-
-    Garters Lane, Saggart, 2 Tower Apartments, D24Y928
-  */
-
-  for(let i=0;i<lines.length;i++){
-
-    const line=lines[i];
-
-    if(
-      roadWords.test(line) &&
-      !candidates.some(c=>c.lineIndex===i)
-    ){
-
-      candidates.push({
-        address:line,
-        lineIndex:i
-      });
-
-    }
-
-  }
-
-  /*
-    Liga cada candidato ao postcode mais próximo.
-  */
-
-  for(const candidate of candidates){
-
-    const nearby=
-      lines.slice(
-        Math.max(0,candidate.lineIndex-1),
-        Math.min(lines.length,candidate.lineIndex+3)
-      ).join(' ');
-
-    const pcs=findPostcodes(nearby);
-
-    candidate.postcode=
-      pcs[0] ||
-      postcodes.find(pc=>
-        norm(candidate.address).includes(norm(pc))
-      ) ||
-      '';
-
-  }
-
-  /*
-    Se o postcode estiver sozinho em outra linha,
-    tenta associá-lo ao endereço imediatamente anterior.
-  */
-
-  for(const pc of postcodes){
-
-    if(!candidates.some(c=>c.postcode===pc)){
-
-      const index=lines.findIndex(x=>
-        x.replace(/\s/g,'').toUpperCase().includes(pc)
-      );
-
-      if(index>=0){
-
-        const previous=lines
-          .slice(Math.max(0,index-3),index)
-          .reverse()
-          .find(x=>roadWords.test(x));
-
-        if(previous){
-
-          candidates.push({
-            address:previous,
-            postcode:pc,
-            lineIndex:index
-          });
-
-        }
-
-      }
-
-    }
-
-  }
-
-  return {
-    raw,
-    lines,
-    postcodes,
-    candidates
-  };
+  return results;
 
 }
 
-/*
-  Escolha do destino.
 
-  REGRA PRINCIPAL:
-  Se houver mais de um endereço no print,
-  o último postcode válido normalmente corresponde
-  ao destino do cliente.
+function cleanPostcode(text){
 
-  Isso evita o erro:
+  const codes =
+    findEircodes(text);
 
-  34 Camden Street Upper
-       restaurante
+  return codes.length
+    ? codes[codes.length - 1]
+    : '';
 
-  sendo usado no lugar de:
+}
 
-  Garters Lane...
-  D24Y928
-       cliente
-*/
 
-function chooseCustomerAddress(data){
+/* =========================================================
+   DETECÇÃO DE TEXTOS DO MAPA
+========================================================= */
 
-  const candidates=data.candidates || [];
-  const postcodes=data.postcodes || [];
+const mapWords = [
 
-  if(!candidates.length && !postcodes.length){
+  'phoenix park',
+  'rathfarnham',
+  'tallaght',
+  'ballyfermot',
+  'clondalkin',
+  'ringsend',
+  'beggars bush',
+  'point village',
+  'grand canal',
+  'river liffey',
+  'cambridge rd',
+  'ranelagh',
+  'rockbrook',
+  'landsdowne',
+  'aviva stadium',
+  'national print museum',
+  'google',
+  'map',
+  'dublin',
+  'harbour'
+
+];
+
+
+function isMapText(line){
+
+  const n = norm(line);
+
+  if(!n) return false;
+
+  return mapWords.some(word =>
+    n.includes(norm(word))
+  );
+
+}
+
+
+/* =========================================================
+   TIPOS DE ENDEREÇO
+========================================================= */
+
+const roadWords = [
+
+  'road',
+  'rd',
+  'avenue',
+  'ave',
+  'street',
+  'st',
+  'lane',
+  'ln',
+  'drive',
+  'dr',
+  'close',
+  'crescent',
+  'grove',
+  'terrace',
+  'park',
+  'way',
+  'court',
+  'ct',
+  'square',
+  'place',
+  'gardens',
+  'lawn',
+  'view',
+  'walk',
+  'rise'
+
+];
+
+
+function hasRoadWord(text){
+
+  const n = norm(text);
+
+  return roadWords.some(word => {
+
+    const pattern =
+      new RegExp(
+        '\\b' + word + '\\b',
+        'i'
+      );
+
+    return pattern.test(n);
+
+  });
+
+}
+
+
+function looksLikeAddress(text){
+
+  const line =
+    cleanLine(text);
+
+  if(!line) return false;
+
+  if(isMapText(line)) return false;
+
+  const hasNumber =
+    /\b\d{1,5}\b/.test(line);
+
+  const hasRoad =
+    hasRoadWord(line);
+
+  return hasNumber && hasRoad;
+
+}
+
+
+/* =========================================================
+   EXTRAÇÃO INTELIGENTE
+========================================================= */
+
+function extract(text){
+
+  const raw =
+    normalizeOcr(text);
+
+  const lines =
+    raw
+      .split(/\n+/)
+      .map(cleanLine)
+      .filter(Boolean);
+
+
+  /*
+    -------------------------------------------------------
+    PASSO 1
+    Encontrar todos os Eircodes.
+    -------------------------------------------------------
+  */
+
+  const eircodes =
+    findEircodes(raw);
+
+
+  /*
+    -------------------------------------------------------
+    PASSO 2
+    Para cada Eircode, procurar as linhas próximas.
+
+    O destino normalmente aparece imediatamente
+    antes ou depois do Eircode.
+    -------------------------------------------------------
+  */
+
+  const candidates = [];
+
+
+  for(let i=0;i<lines.length;i++){
+
+    const line =
+      lines[i];
+
+    const codes =
+      findEircodes(line);
+
+    if(!codes.length) continue;
+
+    const postcode =
+      codes[0];
+
+    let address = '';
+
+
+    /*
+      Primeiro tenta a mesma linha.
+    */
+
+    const sameLine =
+      line
+        .replace(
+          new RegExp(
+            postcode.slice(0,3) +
+            '\\s*' +
+            postcode.slice(3),
+            'i'
+          ),
+          ''
+        )
+        .trim();
+
+    if(
+      sameLine &&
+      looksLikeAddress(sameLine)
+    ){
+
+      address =
+        sameLine;
+
+    }
+
+
+    /*
+      Depois olha 1 linha acima.
+    */
+
+    if(!address && i > 0){
+
+      const previous =
+        lines[i-1];
+
+      if(
+        !isMapText(previous) &&
+        looksLikeAddress(previous)
+      ){
+
+        address =
+          previous;
+
+      }
+
+    }
+
+
+    /*
+      Depois olha 2 linhas acima.
+    */
+
+    if(!address && i > 1){
+
+      const previous2 =
+        lines[i-2];
+
+      if(
+        !isMapText(previous2) &&
+        looksLikeAddress(previous2)
+      ){
+
+        address =
+          previous2;
+
+      }
+
+    }
+
+
+    /*
+      Caso o OCR tenha separado:
+      
+      Garters Lane, Saggart
+      2 Tower Apartments
+      D24Y928
+
+      juntamos as linhas relevantes.
+    */
+
+    if(!address){
+
+      const nearby = [];
+
+      for(
+        let j=Math.max(0,i-3);
+        j<=Math.min(lines.length-1,i+1);
+        j++
+      ){
+
+        if(
+          j === i ||
+          isMapText(lines[j])
+        ){
+          continue;
+        }
+
+        if(
+          /\b\d{1,5}\b/.test(lines[j]) ||
+          hasRoadWord(lines[j])
+        ){
+
+          nearby.push(lines[j]);
+
+        }
+
+      }
+
+      if(nearby.length){
+
+        address =
+          nearby.join(', ');
+
+      }
+
+    }
+
+
+    candidates.push({
+
+      postcode,
+      address,
+      lineIndex:i
+
+    });
+
+  }
+
+
+  /*
+    -------------------------------------------------------
+    PASSO 3
+    Escolher o melhor candidato.
+    
+    O ÚLTIMO Eircode é priorizado porque em muitos
+    prints de delivery ele pertence ao cartão do cliente,
+    enquanto o restaurante aparece antes.
+    -------------------------------------------------------
+  */
+
+  let selected = null;
+
+
+  if(candidates.length){
+
+    const valid =
+      candidates.filter(c =>
+        c.postcode
+      );
+
+    if(valid.length){
+
+      /*
+        Preferimos o último Eircode.
+      */
+
+      selected =
+        valid[valid.length - 1];
+
+    }
+
+  }
+
+
+  /*
+    -------------------------------------------------------
+    PASSO 4
+    Se encontrou Eircode, não usamos texto do mapa.
+    -------------------------------------------------------
+  */
+
+  if(selected){
 
     return {
-      address:'',
-      postcode:'',
-      name:''
+
+      name:extractCustomerName(lines),
+
+      address:selected.address || '',
+
+      postcode:selected.postcode,
+
+      confidence:
+        selected.address
+          ? 'alta'
+          : 'média',
+
+      multiple:
+        eircodes.length > 1,
+
+      raw
+
     };
 
   }
 
-  let selected=null;
 
   /*
-    Primeiro: candidato com o ÚLTIMO postcode.
+    -------------------------------------------------------
+    PASSO 5
+    Sem Eircode:
+    
+    procurar somente endereços realmente fortes.
+    
+    IMPORTANTE:
+    não aceitar texto do mapa.
+    -------------------------------------------------------
   */
 
-  if(postcodes.length){
+  const addressCandidates =
+    lines.filter(line => {
 
-    const lastPc=postcodes[postcodes.length-1];
+      if(isMapText(line)){
+        return false;
+      }
 
-    selected=
-      candidates
-        .slice()
-        .reverse()
-        .find(c=>c.postcode===lastPc) ||
-      candidates
-        .slice()
-        .reverse()
-        .find(c=>
-          norm(c.address).includes(norm(lastPc))
-        );
+      return looksLikeAddress(line);
 
-    if(!selected){
+    });
 
-      selected={
-        address:'',
-        postcode:lastPc,
-        lineIndex:999999
-      };
 
-    }
+  /*
+    Se houver mais de um endereço sem Eircode,
+    NÃO escolher aleatoriamente.
+  */
+
+  if(addressCandidates.length === 1){
+
+    return {
+
+      name:extractCustomerName(lines),
+
+      address:
+        addressCandidates[0],
+
+      postcode:'',
+
+      confidence:'média',
+
+      multiple:false,
+
+      raw
+
+    };
 
   }
 
-  /*
-    Segundo: último candidato.
-  */
-
-  if(!selected && candidates.length){
-
-    selected=candidates[candidates.length-1];
-
-  }
-
-  let address=selected?.address || '';
-  let postcode=selected?.postcode || '';
 
   /*
-    Se encontrou postcode mas o endereço não contém ele,
-    acrescenta.
+    Vários endereços sem Eircode:
+    não confiamos.
   */
-
-  if(postcode && !norm(address).includes(norm(postcode))){
-
-    address=address
-      ? `${address}, ${postcode}`
-      : postcode;
-
-  }
-
-  /*
-    Tenta descobrir o nome do cliente.
-    Preferimos linhas próximas ao endereço escolhido.
-  */
-
-  let name='';
-
-  const idx=selected?.lineIndex;
-
-  if(typeof idx==='number' && idx<100000){
-
-    const nearby=data.lines.slice(
-      Math.max(0,idx-4),
-      Math.min(data.lines.length,idx+2)
-    );
-
-    const bad=[
-      'go to customer',
-      'delivery complete',
-      'deliver order',
-      'collect order',
-      'accept and go',
-      'travel',
-      'tip check'
-    ];
-
-    name=
-      nearby.find(x=>{
-        const n=norm(x);
-
-        return (
-          /^[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ' -]{3,45}$/.test(x) &&
-          !bad.some(b=>n.includes(b)) &&
-          !/\broad\b|\bstreet\b|\blane\b|\bdrive\b|\bavenue\b/i.test(x)
-        );
-
-      }) || '';
-
-  }
 
   return {
-    address:cleanLine(address),
-    postcode,
-    name
+
+    name:extractCustomerName(lines),
+
+    address:'',
+
+    postcode:'',
+
+    confidence:'baixa',
+
+    multiple:
+      addressCandidates.length > 1,
+
+    raw
+
   };
 
 }
 
-function keyFor(e){
 
-  /*
-    O postcode é a chave mais confiável.
-  */
+/* =========================================================
+   NOME DO CLIENTE
+========================================================= */
 
-  if(e.postcode)
-    return 'pc:'+norm(e.postcode);
+function extractCustomerName(lines){
 
-  if(e.address)
-    return 'addr:'+norm(e.address);
+  const blocked = [
+
+    'go to customer',
+    'delivery complete',
+    'deliver order',
+    'collect order',
+    'tip check',
+    'travel',
+    'accept and go',
+    'hyderabadi kitchen',
+    'camden'
+
+  ];
+
+
+  for(const line of lines){
+
+    const n =
+      norm(line);
+
+    if(!n) continue;
+
+    if(
+      blocked.some(x =>
+        n.includes(norm(x))
+      )
+    ){
+      continue;
+    }
+
+    if(isMapText(line)){
+      continue;
+    }
+
+    /*
+      Não aceitar linhas com números.
+    */
+
+    if(/\d/.test(line)){
+      continue;
+    }
+
+    /*
+      Nome provável.
+    */
+
+    if(
+      /^[A-Za-zÀ-ÿ' -]{3,40}$/.test(line)
+    ){
+
+      return line;
+
+    }
+
+  }
 
   return '';
 
 }
 
+
+/* =========================================================
+   CHAVE DO BANCO
+========================================================= */
+
+function keyFor(extracted){
+
+  /*
+    Eircode é SEMPRE prioridade.
+  */
+
+  if(extracted.postcode){
+
+    return 'pc:' +
+      norm(extracted.postcode);
+
+  }
+
+
+  if(extracted.address){
+
+    return 'addr:' +
+      norm(extracted.address);
+
+  }
+
+
+  return '';
+
+}
+
+
+/* =========================================================
+   PREVISÃO
+========================================================= */
+
 async function predict(key){
 
-  if(!key)
-    return {type:'unknown',hits:[]};
+  if(!key){
 
-  const records=await allRecords();
+    return {
+      type:'unknown',
+      hits:[]
+    };
 
-  const hits=records.filter(r=>r.key===key);
+  }
 
-  if(!hits.length)
-    return {type:'unknown',hits:[]};
+  const records =
+    await allRecords();
 
-  const yes=hits.filter(r=>r.tip===true).length;
-  const no=hits.filter(r=>r.tip===false).length;
+  const hits =
+    records.filter(
+      r => r.key === key
+    );
 
-  if(yes && no)
+
+  if(!hits.length){
+
+    return {
+      type:'unknown',
+      hits:[]
+    };
+
+  }
+
+
+  const yes =
+    hits.filter(
+      r => r.tip === true
+    ).length;
+
+  const no =
+    hits.filter(
+      r => r.tip === false
+    ).length;
+
+
+  if(yes && no){
+
     return {
       type:'mixed',
       yes,
@@ -770,213 +1438,566 @@ async function predict(key){
       hits
     };
 
+  }
+
+
   return {
-    type:yes?'yes':'no',
+
+    type:
+      yes
+        ? 'yes'
+        : 'no',
+
     yes,
     no,
     hits
+
   };
 
 }
 
-function showPrediction(p,e){
 
-  const box=document.getElementById('prediction');
+/* =========================================================
+   MOSTRAR RESULTADO
+========================================================= */
 
-  if(p.type==='yes'){
+function showPrediction(
+  prediction,
+  extracted
+){
 
-    box.innerHTML=`
-      <div class="status yes">
-        <div class="big">💶 PROVÁVEL: TEM TIP</div>
-        Histórico: ${p.yes} ocorrência(s) com tip.
-      </div>
-    `;
+  const box =
+    document.getElementById(
+      'prediction'
+    );
 
-  }
 
-  else if(p.type==='no'){
+  const warning =
+    document.getElementById(
+      'warning'
+    );
 
-    box.innerHTML=`
-      <div class="status no">
-        <div class="big">SEM TIP NO HISTÓRICO</div>
-        Histórico: ${p.no} ocorrência(s) sem tip.
-      </div>
-    `;
 
-  }
+  warning.classList.add(
+    'hidden'
+  );
 
-  else if(p.type==='mixed'){
 
-    box.innerHTML=`
+  /*
+    SEM DESTINO CONFIÁVEL
+  */
+
+  if(
+    !extracted.postcode &&
+    !extracted.address
+  ){
+
+    box.innerHTML = `
+
       <div class="status unknown">
-        <div class="big">⚠️ HISTÓRICO INCONSISTENTE</div>
-        ${p.yes} com tip e ${p.no} sem tip.
-        Não dá para afirmar com segurança.
+
+        <div class="big">
+          ❓ DESTINO NÃO IDENTIFICADO
+        </div>
+
+        O app não encontrou um
+        endereço confiável do cliente.
+
       </div>
+
+    `;
+
+    warning.textContent =
+      'O texto do mapa foi ignorado. ' +
+      'Não foi encontrado um Eircode ou endereço confiável.';
+
+    warning.classList.remove(
+      'hidden'
+    );
+
+  }
+
+
+  else if(prediction.type === 'yes'){
+
+    box.innerHTML = `
+
+      <div class="status yes">
+
+        <div class="big">
+          💶 PROVÁVEL: TEM TIP
+        </div>
+
+        Histórico:
+        ${prediction.yes}
+        ocorrência(s) com tip.
+
+      </div>
+
     `;
 
   }
+
+
+  else if(prediction.type === 'no'){
+
+    box.innerHTML = `
+
+      <div class="status no">
+
+        <div class="big">
+          SEM TIP NO HISTÓRICO
+        </div>
+
+        Histórico:
+        ${prediction.no}
+        ocorrência(s) sem tip.
+
+      </div>
+
+    `;
+
+  }
+
+
+  else if(prediction.type === 'mixed'){
+
+    box.innerHTML = `
+
+      <div class="status unknown">
+
+        <div class="big">
+          ⚠️ HISTÓRICO INCONSISTENTE
+        </div>
+
+        ${prediction.yes}
+        com tip e
+        ${prediction.no}
+        sem tip.
+
+        Não dá para afirmar
+        com segurança.
+
+      </div>
+
+    `;
+
+  }
+
 
   else{
 
-    box.innerHTML=`
+    box.innerHTML = `
+
       <div class="status unknown">
-        <div class="big">❓ DESTINO NOVO</div>
-        O endereço foi identificado, mas ainda não existe
-        histórico suficiente para prever a tip.
+
+        <div class="big">
+          ❓ DESTINO NOVO
+        </div>
+
+        O endereço foi identificado,
+        mas ainda não existe histórico
+        suficiente para prever a tip.
+
       </div>
+
     `;
 
   }
 
-  document.getElementById('details').textContent=
-    `Destino reconhecido: ${e.address||'não identificado'}`+
-    (e.postcode ? ` · ${e.postcode}` : '')+
-    (e.name ? ` · Cliente: ${e.name}` : '');
 
-  document.getElementById('learnBtn')
-    .classList.remove('hidden');
+  /*
+    DETALHES
+  */
 
-}
+  let details =
+    'Destino reconhecido: ';
 
-function showCandidates(data,selected){
 
-  const box=document.getElementById('addressCandidates');
+  if(extracted.address){
 
-  const candidates=data.candidates || [];
+    details +=
+      extracted.address;
 
-  if(candidates.length<2){
+  }else{
 
-    box.innerHTML='';
-
-    return;
+    details +=
+      'não identificado';
 
   }
 
-  box.innerHTML=`
-    <div class="warning">
-      <strong>⚠️ Mais de um endereço encontrado no print.</strong>
-      <br><br>
-      O app escolheu o último destino/Eircode como endereço
-      do cliente.
-    </div>
-  `;
+
+  if(extracted.postcode){
+
+    details +=
+      ' · ' +
+      extracted.postcode;
+
+  }
+
+
+  if(extracted.name){
+
+    details +=
+      ' · Cliente: ' +
+      extracted.name;
+
+  }
+
+
+  document.getElementById(
+    'details'
+  ).textContent = details;
+
+
+  /*
+    CONFIANÇA
+  */
+
+  const confidence =
+    document.createElement(
+      'div'
+    );
+
+  confidence.className =
+    'confidence';
+
+  confidence.textContent =
+    'Confiança da identificação: ' +
+    extracted.confidence;
+
+
+  box.appendChild(
+    confidence
+  );
+
+
+  /*
+    AVISO DE MÚLTIPLOS EIRCODES
+  */
+
+  if(extracted.multiple){
+
+    warning.textContent =
+      '⚠️ Mais de um Eircode foi encontrado. ' +
+      'O app usou o último Eircode encontrado, ' +
+      'que normalmente corresponde ao destino do cliente.';
+
+    warning.classList.remove(
+      'hidden'
+    );
+
+  }
+
+
+  document.getElementById(
+    'learnBtn'
+  ).classList.remove(
+    'hidden'
+  );
 
 }
+
+
+/* =========================================================
+   DIALOG ENSINAR
+========================================================= */
 
 function openLearn(){
 
-  document.getElementById('learnText').textContent=
-    `${currentExtracted.address||'Destino não identificado'}`+
-    `${currentExtracted.postcode?' · '+currentExtracted.postcode:''}`;
+  document.getElementById(
+    'learnText'
+  ).textContent =
 
-  document.getElementById('learnDialog').showModal();
+    (
+      currentExtracted.address ||
+      'Destino não identificado'
+    ) +
+
+    (
+      currentExtracted.postcode
+        ? ' · ' +
+          currentExtracted.postcode
+        : ''
+    );
+
+
+  document.getElementById(
+    'learnDialog'
+  ).showModal();
 
 }
+
+
+/* =========================================================
+   APRENDER TIP
+========================================================= */
 
 async function learn(tip){
 
   if(!currentKey){
 
     alert(
-      'Não foi possível identificar o destino. '+
-      'Use um print mais nítido ou corrija o endereço.'
+      'O destino ainda não foi identificado. ' +
+      'Use "Corrigir / ensinar" para informar o destino.'
     );
 
     return;
 
   }
 
+
   await addRecord({
 
     key:currentKey,
 
-    name:currentExtracted.name,
+    name:
+      currentExtracted.name || '',
 
-    address:currentExtracted.address,
+    address:
+      currentExtracted.address || '',
 
-    postcode:currentExtracted.postcode,
+    postcode:
+      currentExtracted.postcode || '',
 
     tip:!!tip,
 
-    date:new Date().toISOString()
+    date:
+      new Date().toISOString()
 
   });
 
-  document.getElementById('learnDialog').close();
 
-  const prediction=
-    await predict(currentKey);
+  document.getElementById(
+    'learnDialog'
+  ).close();
+
+
+  const prediction =
+    await predict(
+      currentKey
+    );
+
 
   showPrediction(
     prediction,
     currentExtracted
   );
 
+
   updateCount();
 
 }
 
-function updateCount(){
 
-  allRecords().then(records=>{
+/* =========================================================
+   CORREÇÃO MANUAL
+========================================================= */
 
-    document.getElementById('count').textContent=
-      `${records.length} registro${records.length===1?'':'s'}`;
+function openManual(){
 
-  });
+  document.getElementById(
+    'manualAddress'
+  ).value =
+    currentExtracted.address || '';
+
+
+  document.getElementById(
+    'manualPostcode'
+  ).value =
+    currentExtracted.postcode || '';
+
+
+  document.getElementById(
+    'manualDialog'
+  ).showModal();
 
 }
 
-/*
-  Pré-processamento OCR.
-*/
 
-async function preprocess(file,mode='full'){
+document.getElementById(
+  'manualCancel'
+).onclick = ()=>{
 
-  const bitmap=await createImageBitmap(file);
+  document.getElementById(
+    'manualDialog'
+  ).close();
 
-  const scale=2.4;
+};
 
-  const canvas=document.createElement('canvas');
 
-  const ctx=canvas.getContext(
-    '2d',
-    {willReadFrequently:true}
+document.getElementById(
+  'manualSave'
+).onclick = async ()=>{
+
+  const address =
+    document.getElementById(
+      'manualAddress'
+    ).value.trim();
+
+
+  const postcodeRaw =
+    document.getElementById(
+      'manualPostcode'
+    ).value.trim();
+
+
+  const postcode =
+    cleanPostcode(
+      postcodeRaw
+    ) ||
+    postcodeRaw
+      .toUpperCase()
+      .replace(/\s+/g,'');
+
+
+  if(!address && !postcode){
+
+    alert(
+      'Digite o endereço ou o Eircode do cliente.'
+    );
+
+    return;
+
+  }
+
+
+  currentExtracted = {
+
+    ...currentExtracted,
+
+    address,
+
+    postcode,
+
+    confidence:'manual',
+
+    multiple:false
+
+  };
+
+
+  currentKey =
+    keyFor(
+      currentExtracted
+    );
+
+
+  document.getElementById(
+    'manualDialog'
+  ).close();
+
+
+  const prediction =
+    await predict(
+      currentKey
+    );
+
+
+  showPrediction(
+    prediction,
+    currentExtracted
   );
 
-  let sx=0;
-  let sy=0;
-  let sw=bitmap.width;
-  let sh=bitmap.height;
+};
 
-  if(mode==='lower'){
 
-    sy=Math.floor(bitmap.height*0.40);
-    sh=Math.floor(bitmap.height*0.60);
+/* =========================================================
+   OCR - PREPROCESSAMENTO
+========================================================= */
+
+async function preprocess(
+  file,
+  mode='full'
+){
+
+  const bitmap =
+    await createImageBitmap(
+      file
+    );
+
+
+  const scale = 2.4;
+
+  const canvas =
+    document.createElement(
+      'canvas'
+    );
+
+
+  const ctx =
+    canvas.getContext(
+      '2d',
+      {
+        willReadFrequently:true
+      }
+    );
+
+
+  let sx = 0;
+  let sy = 0;
+  let sw = bitmap.width;
+  let sh = bitmap.height;
+
+
+  if(mode === 'middle'){
+
+    sy =
+      Math.floor(
+        bitmap.height * 0.20
+      );
+
+    sh =
+      Math.floor(
+        bitmap.height * 0.65
+      );
 
   }
 
-  else if(mode==='middle'){
 
-    sy=Math.floor(bitmap.height*0.20);
-    sh=Math.floor(bitmap.height*0.70);
+  if(mode === 'lower'){
+
+    sy =
+      Math.floor(
+        bitmap.height * 0.40
+      );
+
+    sh =
+      Math.floor(
+        bitmap.height * 0.60
+      );
 
   }
 
-  canvas.width=
-    Math.min(Math.floor(sw*scale),3200);
 
-  canvas.height=
-    Math.min(Math.floor(sh*scale),4200);
+  canvas.width =
+    Math.min(
+      Math.floor(sw * scale),
+      3200
+    );
+
+
+  canvas.height =
+    Math.min(
+      Math.floor(sh * scale),
+      4200
+    );
+
 
   ctx.drawImage(
     bitmap,
-    sx,sy,sw,sh,
-    0,0,canvas.width,canvas.height
+    sx,
+    sy,
+    sw,
+    sh,
+    0,
+    0,
+    canvas.width,
+    canvas.height
   );
 
-  const imageData=
+
+  const image =
     ctx.getImageData(
       0,
       0,
@@ -984,257 +2005,422 @@ async function preprocess(file,mode='full'){
       canvas.height
     );
 
+
   for(
     let i=0;
-    i<imageData.data.length;
+    i<image.data.length;
     i+=4
   ){
 
-    const r=imageData.data[i];
-    const g=imageData.data[i+1];
-    const b=imageData.data[i+2];
+    const r =
+      image.data[i];
 
-    let value=
-      0.299*r+
-      0.587*g+
+    const g =
+      image.data[i+1];
+
+    const b =
+      image.data[i+2];
+
+
+    let v =
+      0.299*r +
+      0.587*g +
       0.114*b;
 
-    value=
-      (value-128)*1.35+128;
 
-    value=
+    v =
+      (v - 128) * 1.35 +
+      128;
+
+
+    v =
       Math.max(
         0,
-        Math.min(255,value)
+        Math.min(
+          255,
+          v
+        )
       );
 
-    imageData.data[i]=value;
-    imageData.data[i+1]=value;
-    imageData.data[i+2]=value;
+
+    image.data[i] =
+      v;
+
+    image.data[i+1] =
+      v;
+
+    image.data[i+2] =
+      v;
 
   }
 
-  ctx.putImageData(imageData,0,0);
+
+  ctx.putImageData(
+    image,
+    0,
+    0
+  );
+
 
   return canvas;
 
 }
 
-async function ocrPass(image,label){
 
-  const result=
+/* =========================================================
+   OCR PASS
+========================================================= */
+
+async function ocrPass(
+  image,
+  label
+){
+
+  const result =
     await Tesseract.recognize(
       image,
       'eng',
       {
+
         logger:m=>{
 
-          if(m.status==='recognizing text'){
+          if(
+            m.status ===
+            'recognizing text'
+          ){
 
-            const pct=
+            const pct =
               Math.round(
-                (m.progress||0)*100
+                (m.progress || 0) *
+                100
               );
+
 
             document.getElementById(
               'ocrStatus'
-            ).textContent=
+            ).textContent =
               `Lendo o print… ${label} ${pct}%`;
 
           }
 
         }
+
       }
     );
+
 
   return result.data.text || '';
 
 }
+
+
+/* =========================================================
+   PROCESSAMENTO PRINCIPAL
+========================================================= */
 
 async function process(file){
 
   if(
     !file ||
     !file.type.startsWith('image/')
-  )
+  ){
+
     return;
 
-  currentImage=file;
-  currentKey=null;
-  currentExtracted={};
+  }
+
+
+  currentImage =
+    file;
+
+  currentKey =
+    null;
+
+  currentExtracted =
+    {};
+
 
   document.getElementById(
     'result'
-  ).classList.remove('hidden');
+  ).classList.remove(
+    'hidden'
+  );
+
 
   document.getElementById(
     'prediction'
-  ).innerHTML='';
+  ).innerHTML =
+    '';
+
 
   document.getElementById(
     'details'
-  ).textContent='';
+  ).textContent =
+    '';
+
 
   document.getElementById(
-    'addressCandidates'
-  ).innerHTML='';
+    'warning'
+  ).classList.add(
+    'hidden'
+  );
+
 
   document.getElementById(
     'learnBtn'
-  ).classList.add('hidden');
+  ).classList.add(
+    'hidden'
+  );
+
 
   document.getElementById(
     'ocrDebug'
-  ).classList.add('hidden');
+  ).classList.add(
+    'hidden'
+  );
 
-  const img=
-    document.getElementById('preview');
 
-  img.src=
-    URL.createObjectURL(file);
+  const img =
+    document.getElementById(
+      'preview'
+    );
 
-  const status=
-    document.getElementById('ocrStatus');
 
-  status.textContent=
+  img.src =
+    URL.createObjectURL(
+      file
+    );
+
+
+  const status =
+    document.getElementById(
+      'ocrStatus'
+    );
+
+
+  status.textContent =
     'Preparando OCR…';
+
 
   try{
 
-    const full=
-      await preprocess(file,'full');
-
-    const middle=
-      await preprocess(file,'middle');
-
-    const lower=
-      await preprocess(file,'lower');
-
-    const texts=[];
-
-    texts.push(
-      await ocrPass(full,'(1/3)')
-    );
-
-    texts.push(
-      await ocrPass(middle,'(2/3)')
-    );
-
-    texts.push(
-      await ocrPass(lower,'(3/3)')
-    );
-
-    const text=
-      texts.join('\n');
-
     /*
-      Nova lógica:
-      1. encontra todos os Eircodes
-      2. encontra todos os endereços
-      3. escolhe o destino associado ao último Eircode
+      Três passagens.
+
+      full:
+      tela inteira
+
+      middle:
+      área central
+
+      lower:
+      área inferior onde normalmente
+      aparece o cartão do cliente.
     */
 
-    const data=
-      extractAddresses(text);
+    const full =
+      await preprocess(
+        file,
+        'full'
+      );
 
-    currentExtracted=
-      chooseCustomerAddress(data);
 
-    currentKey=
-      keyFor(currentExtracted);
+    const middle =
+      await preprocess(
+        file,
+        'middle'
+      );
+
+
+    const lower =
+      await preprocess(
+        file,
+        'lower'
+      );
+
+
+    const texts = [];
+
+
+    texts.push(
+      await ocrPass(
+        full,
+        '(1/3)'
+      )
+    );
+
+
+    texts.push(
+      await ocrPass(
+        middle,
+        '(2/3)'
+      )
+    );
+
+
+    texts.push(
+      await ocrPass(
+        lower,
+        '(3/3)'
+      )
+    );
+
+
+    const text =
+      texts.join('\n');
+
+
+    /*
+      EXTRAÇÃO NOVA
+    */
+
+    currentExtracted =
+      extract(text);
+
+
+    currentKey =
+      keyFor(
+        currentExtracted
+      );
+
 
     document.getElementById(
       'ocrText'
-    ).textContent=
+    ).textContent =
       text ||
       '(nenhum texto reconhecido)';
 
+
     document.getElementById(
       'ocrDebug'
-    ).classList.remove('hidden');
-
-    showCandidates(
-      data,
-      currentExtracted
+    ).classList.remove(
+      'hidden'
     );
 
-    status.textContent=
+
+    status.textContent =
       'Print lido. Consultando banco local…';
 
-    const prediction=
-      await predict(currentKey);
+
+    const prediction =
+      await predict(
+        currentKey
+      );
+
 
     showPrediction(
       prediction,
       currentExtracted
     );
 
-    if(prediction.type==='unknown'){
+
+    /*
+      Se não encontrou destino,
+      NÃO registra automaticamente.
+    */
+
+    if(
+      prediction.type ===
+      'unknown' &&
+      currentKey
+    ){
 
       openLearn();
 
     }
 
-  }
-
-  catch(error){
+  }catch(error){
 
     console.error(error);
 
-    status.textContent=
-      'Não consegui ler o print automaticamente. '+
+
+    status.textContent =
+      'Não consegui ler o print automaticamente. ' +
       'Tente o print original, sem recorte e com boa resolução.';
 
   }
 
 }
 
+
+/* =========================================================
+   UPLOAD
+========================================================= */
+
 document.getElementById(
   'file'
-).onchange=e=>{
+).onchange = e=>{
 
-  if(e.target.files[0])
-    process(e.target.files[0]);
+  if(
+    e.target.files[0]
+  ){
+
+    process(
+      e.target.files[0]
+    );
+
+  }
 
 };
 
-const drop=
-  document.getElementById('drop');
 
-['dragenter','dragover'].forEach(event=>{
+const drop =
+  document.getElementById(
+    'drop'
+  );
+
+
+['dragenter','dragover']
+.forEach(event=>{
 
   drop.addEventListener(
     event,
     e=>{
+
       e.preventDefault();
-      drop.classList.add('drag');
+
+      drop.classList.add(
+        'drag'
+      );
+
     }
   );
 
 });
 
-['dragleave','drop'].forEach(event=>{
+
+['dragleave','drop']
+.forEach(event=>{
 
   drop.addEventListener(
     event,
     e=>{
+
       e.preventDefault();
-      drop.classList.remove('drag');
+
+      drop.classList.remove(
+        'drag'
+      );
+
     }
   );
 
 });
+
 
 drop.addEventListener(
   'drop',
   e=>{
 
-    const file=
+    const file =
       e.dataTransfer.files[0];
+
 
     if(
       file &&
-      file.type.startsWith('image/')
+      file.type.startsWith(
+        'image/'
+      )
     ){
 
       process(file);
@@ -1244,94 +2430,193 @@ drop.addEventListener(
   }
 );
 
+
+/* =========================================================
+   NOVO PRINT
+========================================================= */
+
 document.getElementById(
   'newBtn'
-).onclick=()=>{
+).onclick = ()=>{
 
   document.getElementById(
     'result'
-  ).classList.add('hidden');
+  ).classList.add(
+    'hidden'
+  );
+
 
   document.getElementById(
     'file'
-  ).value='';
+  ).value =
+    '';
 
-  currentKey=null;
-  currentExtracted={};
+
+  currentKey =
+    null;
+
+  currentExtracted =
+    {};
 
 };
 
+
+/* =========================================================
+   BOTÕES
+========================================================= */
+
 document.getElementById(
   'learnBtn'
-).onclick=openLearn;
+).onclick =
+  openManual;
+
 
 document.getElementById(
   'tipYes'
-).onclick=()=>learn(true);
+).onclick =
+  ()=>learn(true);
+
 
 document.getElementById(
   'tipNo'
-).onclick=()=>learn(false);
+).onclick =
+  ()=>learn(false);
+
+
+/* =========================================================
+   CONTADOR
+========================================================= */
+
+function updateCount(){
+
+  allRecords()
+    .then(records=>{
+
+      document.getElementById(
+        'count'
+      ).textContent =
+
+        `${records.length} registro` +
+        `${records.length === 1 ? '' : 's'}`;
+
+    });
+
+}
+
+
+/* =========================================================
+   BANCO - RENDER
+========================================================= */
 
 async function renderDb(){
 
-  const records=
+  const records =
     await allRecords();
 
-  const element=
-    document.getElementById('dbList');
+
+  const el =
+    document.getElementById(
+      'dbList'
+    );
+
 
   if(!records.length){
 
-    element.innerHTML=
+    el.innerHTML =
       '<p class="muted">Banco vazio.</p>';
 
     return;
 
   }
 
-  element.innerHTML=
-    '<table>'+
-    '<thead>'+
-    '<tr>'+
-    '<th>Destino</th>'+
-    '<th>Tip</th>'+
-    '<th>Data</th>'+
-    '</tr>'+
-    '</thead>'+
-    '<tbody>'+
+
+  el.innerHTML =
+
+    '<table>' +
+
+    '<thead>' +
+
+    '<tr>' +
+
+    '<th>Destino</th>' +
+
+    '<th>Tip</th>' +
+
+    '<th>Data</th>' +
+
+    '</tr>' +
+
+    '</thead>' +
+
+    '<tbody>' +
+
     records
       .slice()
       .reverse()
       .map(record=>{
 
-        const address=
-          (record.address||
-           record.postcode||
-           '—')
-          .replace(/</g,'&lt;');
+        const address =
+          (
+            record.address ||
+            record.postcode ||
+            '—'
+          )
+          .replace(
+            /</g,
+            '&lt;'
+          );
+
 
         return `
+
           <tr>
-            <td>${address}</td>
-            <td>${record.tip?'SIM':'NÃO'}</td>
+
             <td>
-              ${new Date(record.date)
-                .toLocaleDateString('pt-BR')}
+              ${address}
+              ${
+                record.postcode
+                  ? '<br><span class="small muted">' +
+                    record.postcode +
+                    '</span>'
+                  : ''
+              }
             </td>
+
+            <td>
+              ${record.tip ? 'SIM' : 'NÃO'}
+            </td>
+
+            <td>
+              ${
+                new Date(
+                  record.date
+                ).toLocaleDateString(
+                  'pt-BR'
+                )
+              }
+            </td>
+
           </tr>
+
         `;
 
       })
-      .join('')+
-    '</tbody>'+
+      .join('') +
+
+    '</tbody>' +
+
     '</table>';
 
 }
 
+
+/* =========================================================
+   ABRIR BANCO
+========================================================= */
+
 document.getElementById(
   'dbBtn'
-).onclick=()=>{
+).onclick = ()=>{
 
   renderDb();
 
@@ -1341,9 +2626,10 @@ document.getElementById(
 
 };
 
+
 document.getElementById(
   'closeDb'
-).onclick=()=>{
+).onclick = ()=>{
 
   document.getElementById(
     'dbDialog'
@@ -1351,47 +2637,73 @@ document.getElementById(
 
 };
 
+
+/* =========================================================
+   EXPORTAR
+========================================================= */
+
 document.getElementById(
   'exportBtn'
-).onclick=async()=>{
+).onclick = async ()=>{
 
-  const blob=
+  const records =
+    await allRecords();
+
+
+  const blob =
     new Blob(
       [
         JSON.stringify(
-          await allRecords(),
+          records,
           null,
           2
         )
       ],
       {
-        type:'application/json'
+        type:
+          'application/json'
       }
     );
 
-  const link=
-    document.createElement('a');
 
-  link.href=
-    URL.createObjectURL(blob);
+  const a =
+    document.createElement(
+      'a'
+    );
 
-  link.download=
+
+  a.href =
+    URL.createObjectURL(
+      blob
+    );
+
+
+  a.download =
     'tip-check-backup.json';
 
-  link.click();
+
+  a.click();
+
 
   setTimeout(
     ()=>{
-      URL.revokeObjectURL(link.href);
+      URL.revokeObjectURL(
+        a.href
+      );
     },
     1000
   );
 
 };
 
+
+/* =========================================================
+   IMPORTAR
+========================================================= */
+
 document.getElementById(
   'importBtn'
-).onclick=()=>{
+).onclick = ()=>{
 
   document.getElementById(
     'importFile'
@@ -1399,67 +2711,92 @@ document.getElementById(
 
 };
 
+
 document.getElementById(
   'importFile'
-).onchange=async e=>{
+).onchange =
+  async e=>{
 
-  try{
+    try{
 
-    const file=
-      e.target.files[0];
+      const file =
+        e.target.files[0];
 
-    if(!file)
-      return;
 
-    const records=
-      JSON.parse(
-        await file.text()
+      if(!file) return;
+
+
+      const records =
+        JSON.parse(
+          await file.text()
+        );
+
+
+      if(
+        !Array.isArray(
+          records
+        )
+      ){
+
+        throw new Error(
+          'Backup inválido'
+        );
+
+      }
+
+
+      await clearRecords();
+
+
+      for(
+        const record
+        of records
+      ){
+
+        const copy =
+          {...record};
+
+        delete copy.id;
+
+        await addRecord(
+          copy
+        );
+
+      }
+
+
+      renderDb();
+
+      updateCount();
+
+
+    }catch(error){
+
+      alert(
+        'Não foi possível importar este backup.'
       );
 
-    if(!Array.isArray(records))
-      throw new Error('Backup inválido');
+      console.error(
+        error
+      );
 
-    await clearRecords();
+    }finally{
 
-    for(const record of records){
-
-      const copy={
-        ...record
-      };
-
-      delete copy.id;
-
-      await addRecord(copy);
+      e.target.value =
+        '';
 
     }
 
-    await renderDb();
+  };
 
-    updateCount();
 
-  }
-
-  catch(error){
-
-    alert(
-      'Não foi possível importar este backup.'
-    );
-
-    console.error(error);
-
-  }
-
-  finally{
-
-    e.target.value='';
-
-  }
-
-};
+/* =========================================================
+   APAGAR BANCO
+========================================================= */
 
 document.getElementById(
   'clearBtn'
-).onclick=async()=>{
+).onclick = async ()=>{
 
   if(
     confirm(
@@ -1469,7 +2806,7 @@ document.getElementById(
 
     await clearRecords();
 
-    await renderDb();
+    renderDb();
 
     updateCount();
 
@@ -1477,13 +2814,30 @@ document.getElementById(
 
 };
 
-if('serviceWorker' in navigator){
+
+/* =========================================================
+   SERVICE WORKER
+========================================================= */
+
+if(
+  'serviceWorker'
+  in navigator
+){
 
   navigator.serviceWorker
-    .register('./sw.js')
-    .catch(console.error);
+    .register(
+      './sw.js'
+    )
+    .catch(
+      console.error
+    );
 
 }
+
+
+/* =========================================================
+   INICIALIZAÇÃO
+========================================================= */
 
 updateCount();
 
