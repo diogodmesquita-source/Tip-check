@@ -79,7 +79,6 @@
       justify-content: center;
       text-align: center;
       padding: 24px;
-      transition: .2s;
     }
 
     .drop.drag {
@@ -275,1647 +274,1465 @@
 </head>
 
 <body>
-<div class="app">
+  <div class="app">
 
-  <header>
-    <div>
-      <h1>Tip Check</h1>
-      <div class="sub">Previsão de tip antes de coletar</div>
-    </div>
-
-    <button class="secondary" id="dbBtn">Banco</button>
-  </header>
-
-  <section class="card">
-    <div id="drop" class="drop">
+    <header>
       <div>
-        <strong>Selecione o print da entrega</strong>
-
-        <div class="muted">
-          Escolha uma imagem da galeria do celular
-        </div>
-
-        <br>
-
-        <label class="filebtn">
-          <input id="file" type="file" accept="image/*">
-          <span class="pill">Escolher print</span>
-        </label>
+        <h1>Tip Check</h1>
+        <div class="sub">Previsão de tip antes de coletar</div>
       </div>
+
+      <button class="secondary" id="dbBtn">Banco</button>
+    </header>
+
+    <section class="card">
+      <div id="drop" class="drop">
+        <div>
+          <strong>Selecione o print da entrega</strong>
+
+          <div class="muted">
+            Escolha uma imagem da galeria do celular
+          </div>
+
+          <br>
+
+          <label class="filebtn">
+            <input id="file" type="file" accept="image/*">
+            <span class="pill">Escolher print</span>
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <section id="result" class="card hidden">
+      <img id="preview" class="preview" alt="Print selecionado">
+
+      <div id="ocrStatus" class="status info">
+        Preparando OCR…
+      </div>
+
+      <div id="prediction"></div>
+
+      <div id="details" class="small muted"></div>
+
+      <div id="warning" class="status warning hidden"></div>
+
+      <details id="ocrDebug" class="small hidden">
+        <summary>Texto reconhecido — diagnóstico</summary>
+        <div id="ocrText" class="debug"></div>
+      </details>
+
+      <div class="actions" style="margin-top:14px">
+        <button id="newBtn" class="secondary">
+          Novo print
+        </button>
+
+        <button id="learnBtn" class="secondary hidden">
+          Corrigir destino
+        </button>
+
+        <button id="recordBtn" class="secondary hidden">
+          Registrar tip
+        </button>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="row">
+        <strong>Como funciona</strong>
+
+        <span class="pill" id="count">
+          0 registros
+        </span>
+      </div>
+
+      <div class="muted small">
+        O app procura o Eircode e o endereço do cliente.
+        Textos do mapa, como bairros, estradas e pontos
+        de interesse, são ignorados sempre que possível.
+
+        Quando o destino é novo, você pode corrigir o
+        endereço manualmente. Depois da entrega, registre
+        se houve tip para o app aprender com o histórico.
+
+        Os dados ficam armazenados neste dispositivo.
+      </div>
+    </section>
+
+    <div class="footer">
+      Dados armazenados neste iPhone.
+      Nenhum print é enviado para um servidor por este app.
     </div>
-  </section>
+  </div>
 
-  <section id="result" class="card hidden">
-    <img id="preview" class="preview" alt="Print selecionado">
+  <dialog id="dbDialog">
+    <h2>Banco de dados</h2>
 
-    <div id="ocrStatus" class="status info">
-      Preparando OCR…
+    <div id="dbList"></div>
+
+    <div class="actions" style="margin-top:16px">
+      <button id="exportBtn" class="secondary">
+        Exportar backup
+      </button>
+
+      <button id="importBtn" class="secondary">
+        Importar
+      </button>
+
+      <button id="clearBtn" class="danger">
+        Apagar tudo
+      </button>
+
+      <button id="closeDb" class="secondary">
+        Fechar
+      </button>
     </div>
 
-    <div id="prediction"></div>
-    <div id="details" class="small muted"></div>
-    <div id="warning" class="status warning hidden"></div>
+    <input
+      id="importFile"
+      type="file"
+      accept=".json,application/json"
+      class="hidden"
+    >
+  </dialog>
 
-    <details id="ocrDebug" class="small hidden">
-      <summary>Texto reconhecido — diagnóstico</summary>
-      <div id="ocrText" class="debug"></div>
-    </details>
+  <dialog id="learnDialog">
+    <h2>Registrar resultado</h2>
+
+    <p class="muted">
+      Faça a entrega primeiro. Depois informe se o cliente
+      deixou tip.
+    </p>
+
+    <div id="learnText" class="small"></div>
+
+    <p>
+      <strong>Depois de coletar, teve tip?</strong>
+    </p>
+
+    <div class="actions">
+      <button id="tipYes">
+        Sim, teve tip
+      </button>
+
+      <button id="tipNo" class="danger">
+        Não teve tip
+      </button>
+    </div>
 
     <div class="actions" style="margin-top:14px">
-      <button id="newBtn" class="secondary">
-        Novo print
-      </button>
-
-      <button id="learnBtn" class="secondary hidden">
-        Corrigir destino
-      </button>
-
-      <button id="recordBtn" class="secondary hidden">
-        Registrar tip
+      <button id="learnCancel" class="secondary">
+        Cancelar
       </button>
     </div>
-  </section>
+  </dialog>
 
-  <section class="card">
-    <div class="row">
-      <strong>Como funciona</strong>
+  <dialog id="manualDialog">
+    <h2>Corrigir destino</h2>
 
-      <span class="pill" id="count">
-        0 registros
-      </span>
+    <p class="muted small">
+      Se o OCR não identificou corretamente o destino,
+      coloque aqui o endereço ou Eircode do cliente.
+    </p>
+
+    <label class="small" for="manualAddress">
+      Endereço do cliente
+    </label>
+
+    <input
+      id="manualAddress"
+      type="text"
+      placeholder="Ex.: 1 Templeogue Rd, Bushy Park House"
+    >
+
+    <label class="small" for="manualPostcode">
+      Eircode
+    </label>
+
+    <input
+      id="manualPostcode"
+      type="text"
+      placeholder="Ex.: D6W YE27"
+    >
+
+    <div class="actions" style="margin-top:14px">
+      <button id="manualSave">
+        Salvar destino
+      </button>
+
+      <button id="manualCancel" class="secondary">
+        Cancelar
+      </button>
     </div>
+  </dialog>
 
-    <div class="muted small">
-      O app não tenta ler a tip do print.
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
-      Ele procura o Eircode e o endereço do cliente.
-      Textos do mapa, como parques, bairros,
-      estradas e pontos de interesse, são ignorados.
+  <script>
+    const DB_NAME = 'tip-check-db';
+    const STORE = 'records';
+    const DB_VERSION = 4;
 
-      Quando o destino é novo, você pode corrigir
-      o endereço e, depois da coleta, registrar
-      se houve tip.
+    let currentImage = null;
+    let currentKey = '';
+    let currentExtracted = {};
+    let imageUrl = null;
 
-      Os dados ficam armazenados neste dispositivo.
-    </div>
-  </section>
+    function $(id) {
+      return document.getElementById(id);
+    }
 
-  <div class="footer">
-    Dados armazenados neste iPhone.
-    Nenhum print é enviado para um servidor por este app.
-  </div>
-</div>
+    function escapeHTML(text) {
+      return String(text || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
 
-<dialog id="dbDialog">
-  <h2>Banco de dados</h2>
+    function norm(text) {
+      return String(text || '')
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9\s]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
 
-  <div id="dbList"></div>
+    function normalizeOcr(text) {
+      return String(text || '')
+        .replace(/[“”"]/g, '')
+        .replace(/\r/g, '\n')
+        .replace(/[ \t]+/g, ' ')
+        .replace(/\n{2,}/g, '\n')
+        .trim();
+    }
 
-  <div class="actions" style="margin-top:16px">
-    <button id="exportBtn" class="secondary">
-      Exportar backup
-    </button>
+    function cleanLine(text) {
+      return String(text || '')
+        .replace(/[|]/g, 'I')
+        .replace(/[<>«»←→]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .replace(/^[^A-Za-z0-9À-ÿ]+/, '')
+        .trim();
+    }
 
-    <button id="importBtn" class="secondary">
-      Importar
-    </button>
+    /*
+      Eircode irlandês.
 
-    <button id="clearBtn" class="danger">
-      Apagar tudo
-    </button>
+      Aceita, por exemplo:
+      D6W YE27
+      D6WYE27
+      D12 ABCD
+      D12ABCD
+    */
+    function findEircodes(text) {
+      const upper = String(text || '')
+        .toUpperCase()
+        .replace(/[^A-Z0-9\s]/g, ' ');
 
-    <button id="closeDb" class="secondary">
-      Fechar
-    </button>
-  </div>
+      const results = [];
 
-  <input
-    id="importFile"
-    type="file"
-    accept=".json,application/json"
-    class="hidden"
-  >
-</dialog>
+      const regex =
+        /\b([A-Z]\s*\d\s*[A-Z0-9])\s*([A-Z0-9]{4})\b/g;
 
-<dialog id="learnDialog">
-  <h2>Registrar resultado</h2>
+      let match;
 
-  <p class="muted">
-    Faça a entrega primeiro. Depois informe
-    se o cliente deixou tip.
-  </p>
+      while ((match = regex.exec(upper)) !== null) {
+        const code = (match[1] + match[2])
+          .replace(/\s+/g, '');
 
-  <div id="learnText" class="small"></div>
-
-  <p>
-    <strong>Depois de coletar, teve tip?</strong>
-  </p>
-
-  <div class="actions">
-    <button id="tipYes">
-      Sim, teve tip
-    </button>
-
-    <button id="tipNo" class="danger">
-      Não teve tip
-    </button>
-  </div>
-
-  <div class="actions" style="margin-top:14px">
-    <button id="learnCancel" class="secondary">
-      Cancelar
-    </button>
-  </div>
-</dialog>
-
-<dialog id="manualDialog">
-  <h2>Corrigir destino</h2>
-
-  <p class="muted small">
-    Se o OCR não identificou corretamente
-    o endereço do cliente, coloque aqui
-    o endereço ou Eircode do destino.
-  </p>
-
-  <label class="small" for="manualAddress">
-    Endereço do cliente
-  </label>
-
-  <input
-    id="manualAddress"
-    type="text"
-    placeholder="Ex.: 1 Templeogue Rd, Bushy Park House"
-  >
-
-  <label class="small" for="manualPostcode">
-    Eircode
-  </label>
-
-  <input
-    id="manualPostcode"
-    type="text"
-    placeholder="Ex.: D6W YE27"
-  >
-
-  <div class="actions" style="margin-top:14px">
-    <button id="manualSave">
-      Salvar destino
-    </button>
-
-    <button id="manualCancel" class="secondary">
-      Cancelar
-    </button>
-  </div>
-</dialog>
-
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-
-<script>
-/* =========================================================
-   CONFIGURAÇÃO
-========================================================= */
-
-const DB_NAME = 'tip-check-db';
-const STORE = 'records';
-const DB_VERSION = 3;
-
-let currentImage = null;
-let currentKey = null;
-let currentExtracted = {};
-let imageUrl = null;
-
-
-/* =========================================================
-   FUNÇÕES AUXILIARES
-========================================================= */
-
-function $(id) {
-  return document.getElementById(id);
-}
-
-function escapeHTML(text) {
-  return String(text || '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
-
-
-/* =========================================================
-   BANCO INDEXEDDB
-========================================================= */
-
-function dbOpen() {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, DB_VERSION);
-
-    request.onupgradeneeded = () => {
-      const db = request.result;
-
-      if (!db.objectStoreNames.contains(STORE)) {
-        db.createObjectStore(STORE, {
-          keyPath: 'id',
-          autoIncrement: true
-        });
+        if (!results.includes(code)) {
+          results.push(code);
+        }
       }
-    };
 
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
-  });
-}
-
-async function allRecords() {
-  const db = await dbOpen();
-
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE, 'readonly');
-    const request = tx.objectStore(STORE).getAll();
-
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
-  });
-}
-
-async function addRecord(record) {
-  const db = await dbOpen();
-
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE, 'readwrite');
-
-    tx.objectStore(STORE).add(record);
-
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
-  });
-}
-
-async function clearRecords() {
-  const db = await dbOpen();
-
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE, 'readwrite');
-
-    tx.objectStore(STORE).clear();
-
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
-  });
-}
-
-
-/* =========================================================
-   NORMALIZAÇÃO
-========================================================= */
-
-function norm(text) {
-  return String(text || '')
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9\s]/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
-function normalizeOcr(text) {
-  return String(text || '')
-    .replace(/[“”"]/g, '')
-    .replace(/\r/g, '\n')
-    .replace(/[ \t]+/g, ' ')
-    .replace(/\n{2,}/g, '\n')
-    .trim();
-}
-
-function cleanLine(text) {
-  return String(text || '')
-    .replace(/[|]/g, 'I')
-    .replace(/[<>«»←→]/g, ' ')
-    .replace(/\s+/g, ' ')
-    .replace(/^[^A-Za-z0-9À-ÿ]+/, '')
-    .trim();
-}
-
-
-/* =========================================================
-   EIRCODE — VERSÃO CORRIGIDA
-========================================================= */
-
-function normalizePostcode(code) {
-  const clean = String(code || '')
-    .toUpperCase()
-    .replace(/[^A-Z0-9]/g, '');
-
-  if (!/^[A-Z]\d{2}[A-Z0-9]{4}$/.test(clean)) {
-    return '';
-  }
-
-  return clean;
-}
-
-function displayPostcode(code) {
-  const normalized = normalizePostcode(code);
-
-  if (!normalized) {
-    return '';
-  }
-
-  return normalized.slice(0, 3) + ' ' + normalized.slice(3);
-}
-
-function findEircodes(text) {
-  const upper = String(text || '')
-    .toUpperCase()
-    .replace(/[‐-‒–—]/g, '-')
-    .replace(/[^A-Z0-9\s-]/g, ' ');
-
-  const results = [];
-  const regex = /\b([A-Z]\d{2})[\s-]*([A-Z0-9]{4})\b/g;
-
-  let match;
-
-  while ((match = regex.exec(upper)) !== null) {
-    const code = normalizePostcode(
-      match[1] + match[2]
-    );
-
-    if (code && !results.includes(code)) {
-      results.push(code);
-    }
-  }
-
-  return results;
-}
-
-function removeEircodes(text) {
-  return String(text || '')
-    .replace(
-      /\b[A-Z]\s*\d{2}[\s-]*[A-Z0-9]\s*[A-Z0-9]\s*[A-Z0-9]\s*[A-Z0-9]\b/gi,
-      ' '
-    )
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
-function cleanPostcode(text) {
-  const codes = findEircodes(text);
-
-  if (codes.length) {
-    return codes[0];
-  }
-
-  return normalizePostcode(text);
-}
-
-
-/* =========================================================
-   TEXTOS DO MAPA
-========================================================= */
-
-const mapWords = [
-  'phoenix park',
-  'bushy park',
-  'rathfarnham',
-  'tallaght',
-  'ballyfermot',
-  'clondalkin',
-  'ringsend',
-  'beggars bush',
-  'point village',
-  'grand canal',
-  'river liffey',
-  'cambridge rd',
-  'ranelagh',
-  'rockbrook',
-  'landsdowne',
-  'aviva stadium',
-  'national print museum',
-  'google',
-  'map',
-  'dublin',
-  'harbour',
-  'rathgar',
-  'terenure',
-  'milltown',
-  'rathmines',
-  'rathcoole',
-  'hospital',
-  'park'
-];
-
-function isMapText(line) {
-  const n = norm(line);
-
-  if (!n) {
-    return false;
-  }
-
-  return mapWords.some(word => {
-    return n.includes(norm(word));
-  });
-}
-
-
-/* =========================================================
-   DETECÇÃO DE ENDEREÇOS
-========================================================= */
-
-const roadWords = [
-  'road',
-  'rd',
-  'avenue',
-  'ave',
-  'street',
-  'st',
-  'lane',
-  'ln',
-  'drive',
-  'dr',
-  'close',
-  'crescent',
-  'grove',
-  'terrace',
-  'park',
-  'way',
-  'court',
-  'ct',
-  'square',
-  'place',
-  'gardens',
-  'lawn',
-  'view',
-  'walk',
-  'rise'
-];
-
-function hasRoadWord(text) {
-  const n = norm(text);
-
-  return roadWords.some(word => {
-    const pattern = new RegExp(
-      '\\b' + word + '\\b',
-      'i'
-    );
-
-    return pattern.test(n);
-  });
-}
-
-function looksLikeAddress(text) {
-  const line = cleanLine(text);
-
-  if (!line || isMapText(line)) {
-    return false;
-  }
-
-  const hasNumber = /\b\d{1,5}\b/.test(line);
-  const hasRoad = hasRoadWord(line);
-
-  return hasNumber && hasRoad;
-}
-
-
-/* =========================================================
-   NOME DO CLIENTE
-========================================================= */
-
-function extractCustomerName(lines, preferredIndex = -1) {
-  const blocked = [
-    'go to customer',
-    'delivery complete',
-    'deliver order',
-    'collect order',
-    'tip check',
-    'travel',
-    'accept and go',
-    'hyderabadi kitchen',
-    'camden',
-    'customer',
-    'order',
-    'delivery',
-    'templeogue',
-    'bushy park'
-  ];
-
-  function isPossibleName(line) {
-    const cleaned = cleanLine(line);
-    const n = norm(cleaned);
-
-    if (!cleaned || !n) {
-      return false;
+      return results;
     }
 
-    if (isMapText(cleaned)) {
-      return false;
+    function cleanPostcode(text) {
+      const codes = findEircodes(text);
+
+      if (codes.length) {
+        return codes[codes.length - 1];
+      }
+
+      return String(text || '')
+        .toUpperCase()
+        .replace(/[^A-Z0-9]/g, '');
     }
 
-    if (blocked.some(word => n.includes(norm(word)))) {
-      return false;
+    const mapWords = [
+      'phoenix park',
+      'bushy park',
+      'rathgar',
+      'terenure',
+      'rathfarnham',
+      'tallaght',
+      'ballyfermot',
+      'clondalkin',
+      'ringsend',
+      'beggars bush',
+      'point village',
+      'grand canal',
+      'river liffey',
+      'cambridge rd',
+      'ranelagh',
+      'rockbrook',
+      'landsdowne',
+      'aviva stadium',
+      'national print museum',
+      'google',
+      'dublin',
+      'harbour',
+      'milltown'
+    ];
+
+    function isMapText(line) {
+      const value = norm(line);
+
+      if (!value) {
+        return false;
+      }
+
+      return mapWords.some(word =>
+        value.includes(norm(word))
+      );
     }
 
-    if (/\d/.test(cleaned)) {
-      return false;
+    const roadWords = [
+      'road',
+      'rd',
+      'avenue',
+      'ave',
+      'street',
+      'st',
+      'lane',
+      'ln',
+      'drive',
+      'dr',
+      'close',
+      'crescent',
+      'grove',
+      'terrace',
+      'park',
+      'way',
+      'court',
+      'ct',
+      'square',
+      'place',
+      'gardens',
+      'lawn',
+      'view',
+      'walk',
+      'rise',
+      'house'
+    ];
+
+    function hasRoadWord(text) {
+      const value = norm(text);
+
+      return roadWords.some(word => {
+        const pattern = new RegExp(
+          '\\b' + word + '\\b',
+          'i'
+        );
+
+        return pattern.test(value);
+      });
     }
 
-    if (hasRoadWord(cleaned)) {
-      return false;
+    function looksLikeAddress(text) {
+      const line = cleanLine(text);
+
+      if (!line || isMapText(line)) {
+        return false;
+      }
+
+      const hasNumber = /\b\d{1,5}\b/.test(line);
+      const hasRoad = hasRoadWord(line);
+
+      return hasNumber && hasRoad;
     }
 
-    return /^[A-Za-zÀ-ÿ' -]{3,60}$/.test(cleaned);
-  }
-
-  /*
-    Primeiro procura perto do Eircode selecionado.
-  */
-
-  if (preferredIndex >= 0) {
-    for (let distance = 1; distance <= 4; distance++) {
-      const indexes = [
-        preferredIndex - distance,
-        preferredIndex + distance
+    function extractCustomerName(lines) {
+      const blocked = [
+        'go to customer',
+        'delivery complete',
+        'deliver order',
+        'collect order',
+        'tip check',
+        'travel',
+        'accept and go',
+        'hyderabadi kitchen',
+        'camden',
+        'customer'
       ];
 
-      for (const index of indexes) {
-        if (index < 0 || index >= lines.length) {
+      for (const line of lines) {
+        const value = norm(line);
+
+        if (!value) {
           continue;
         }
 
-        if (isPossibleName(lines[index])) {
-          return lines[index];
+        if (blocked.some(word =>
+          value.includes(norm(word))
+        )) {
+          continue;
+        }
+
+        if (isMapText(line)) {
+          continue;
+        }
+
+        if (/\d/.test(line)) {
+          continue;
+        }
+
+        if (/^[A-Za-zÀ-ÿ' -]{3,40}$/.test(line)) {
+          return line;
         }
       }
-    }
-  }
 
-  /*
-    Fallback: procura no restante do texto.
-  */
-
-  for (const line of lines) {
-    if (isPossibleName(line)) {
-      return line;
-    }
-  }
-
-  return '';
-}
-
-
-/* =========================================================
-   EXTRAÇÃO INTELIGENTE DO DESTINO
-========================================================= */
-
-function extract(text) {
-  const raw = normalizeOcr(text);
-
-  const lines = raw
-    .split(/\n+/)
-    .map(cleanLine)
-    .filter(Boolean);
-
-  const allEircodes = findEircodes(raw);
-  const candidates = [];
-
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    const codes = findEircodes(line);
-
-    if (!codes.length) {
-      continue;
+      return '';
     }
 
-    for (const postcode of codes) {
-      let address = '';
-      let score = 0;
+    function extract(text) {
+      const raw = normalizeOcr(text);
 
-      /*
-        Caso o endereço e o Eircode estejam na mesma linha.
-      */
+      const lines = raw
+        .split(/\n+/)
+        .map(cleanLine)
+        .filter(Boolean);
 
-      const sameLine = removeEircodes(line);
+      const allCodes = findEircodes(raw);
+      const candidates = [];
 
-      if (
-        sameLine &&
-        !isMapText(sameLine) &&
-        looksLikeAddress(sameLine)
-      ) {
-        address = sameLine;
-        score += 25;
-      }
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+        const codes = findEircodes(line);
 
-      /*
-        Procura endereço nas linhas próximas.
-      */
+        if (!codes.length) {
+          continue;
+        }
 
-      for (const distance of [1, 2, 3]) {
-        const previousIndex = i - distance;
-        const nextIndex = i + distance;
+        const postcode = codes[0];
+        let address = '';
 
-        if (previousIndex >= 0) {
-          const previous = lines[previousIndex];
+        const compactCode = postcode.replace(/\s+/g, '');
+
+        const sameLine = line
+          .replace(
+            new RegExp(
+              compactCode.slice(0, 3) +
+              '\\s*' +
+              compactCode.slice(3),
+              'i'
+            ),
+            ''
+          )
+          .trim();
+
+        if (sameLine && looksLikeAddress(sameLine)) {
+          address = sameLine;
+        }
+
+        if (!address && i > 0) {
+          const previous = lines[i - 1];
 
           if (
             !isMapText(previous) &&
             looksLikeAddress(previous)
           ) {
-            if (!address) {
-              address = previous;
-            }
-
-            score += Math.max(1, 14 - distance * 2);
+            address = previous;
           }
         }
 
-        if (nextIndex < lines.length) {
-          const next = lines[nextIndex];
+        if (!address && i > 1) {
+          const previousTwo = lines[i - 2];
+
+          if (
+            !isMapText(previousTwo) &&
+            looksLikeAddress(previousTwo)
+          ) {
+            address = previousTwo;
+          }
+        }
+
+        if (!address && i + 1 < lines.length) {
+          const next = lines[i + 1];
 
           if (
             !isMapText(next) &&
             looksLikeAddress(next)
           ) {
-            if (!address) {
-              address = next;
-            }
-
-            score += Math.max(1, 10 - distance * 2);
+            address = next;
           }
         }
+
+        if (!address) {
+          const nearby = [];
+
+          for (
+            let j = Math.max(0, i - 3);
+            j <= Math.min(lines.length - 1, i + 2);
+            j++
+          ) {
+            if (j === i) {
+              continue;
+            }
+
+            if (isMapText(lines[j])) {
+              continue;
+            }
+
+            if (
+              /\b\d{1,5}\b/.test(lines[j]) ||
+              hasRoadWord(lines[j])
+            ) {
+              nearby.push(lines[j]);
+            }
+          }
+
+          if (nearby.length) {
+            address = nearby.join(', ');
+          }
+        }
+
+        candidates.push({
+          postcode,
+          address,
+          lineIndex: i
+        });
       }
 
       /*
-        Um Eircode associado a um endereço recebe prioridade.
+        Remove duplicados causados pelas três passagens
+        do OCR.
       */
-
-      if (address) {
-        score += 15;
-      }
-
-      /*
-        Penaliza Eircodes em linhas do mapa.
-      */
-
-      if (isMapText(line)) {
-        score -= 40;
-      }
-
-      /*
-        Pontuação adicional para linhas com número e rua.
-      */
-
-      if (/\b\d{1,5}\b/.test(line)) {
-        score += 5;
-      }
-
-      if (hasRoadWord(line)) {
-        score += 5;
-      }
-
-      candidates.push({
-        postcode,
-        address,
-        lineIndex: i,
-        score
-      });
-    }
-  }
-
-  /*
-    Mantém somente o melhor candidato de cada Eircode.
-  */
-
-  const bestByPostcode = new Map();
-
-  for (const candidate of candidates) {
-    const previous = bestByPostcode.get(candidate.postcode);
-
-    if (
-      !previous ||
-      candidate.score > previous.score
-    ) {
-      bestByPostcode.set(
-        candidate.postcode,
-        candidate
-      );
-    }
-  }
-
-  const uniqueCandidates = Array.from(
-    bestByPostcode.values()
-  );
-
-  uniqueCandidates.sort((a, b) => {
-    return b.score - a.score;
-  });
-
-  const selected = uniqueCandidates[0] || null;
-
-  if (selected) {
-    const confidence =
-      selected.score >= 35
-        ? 'alta'
-        : selected.score >= 18
-          ? 'média'
-          : 'baixa';
-
-    return {
-      name: extractCustomerName(
-        lines,
-        selected.lineIndex
-      ),
-      address: selected.address || '',
-      postcode: selected.postcode,
-      confidence,
-      multiple: allEircodes.length > 1,
-      raw
-    };
-  }
-
-  /*
-    Fallback: endereço reconhecido sem Eircode.
-  */
-
-  const addressCandidates = lines.filter(line => {
-    if (isMapText(line)) {
-      return false;
-    }
-
-    return looksLikeAddress(line);
-  });
-
-  if (addressCandidates.length === 1) {
-    return {
-      name: extractCustomerName(lines),
-      address: addressCandidates[0],
-      postcode: '',
-      confidence: 'média',
-      multiple: false,
-      raw
-    };
-  }
-
-  return {
-    name: extractCustomerName(lines),
-    address: '',
-    postcode: '',
-    confidence: 'baixa',
-    multiple: addressCandidates.length > 1,
-    raw
-  };
-}
-
-
-/* =========================================================
-   CHAVE DO BANCO
-========================================================= */
-
-function keyFor(extracted) {
-  const postcode = normalizePostcode(
-    extracted.postcode || ''
-  );
-
-  if (postcode) {
-    return 'pc:' + norm(postcode);
-  }
-
-  if (extracted.address) {
-    return 'addr:' + norm(extracted.address);
-  }
-
-  return '';
-}
-
-
-/* =========================================================
-   PREVISÃO
-========================================================= */
-
-async function predict(key) {
-  if (!key) {
-    return {
-      type: 'unknown',
-      hits: []
-    };
-  }
-
-  const records = await allRecords();
-  const hits = records.filter(record => {
-    return record.key === key;
-  });
-
-  if (!hits.length) {
-    return {
-      type: 'unknown',
-      hits: []
-    };
-  }
-
-  const yes = hits.filter(record => {
-    return record.tip === true;
-  }).length;
-
-  const no = hits.filter(record => {
-    return record.tip === false;
-  }).length;
-
-  if (yes && no) {
-    return {
-      type: 'mixed',
-      yes,
-      no,
-      hits
-    };
-  }
-
-  return {
-    type: yes ? 'yes' : 'no',
-    yes,
-    no,
-    hits
-  };
-}
-
-
-/* =========================================================
-   BOTÕES DO RESULTADO
-========================================================= */
-
-function updateResultButtons() {
-  $('learnBtn').classList.remove('hidden');
-
-  if (currentKey) {
-    $('recordBtn').classList.remove('hidden');
-  } else {
-    $('recordBtn').classList.add('hidden');
-  }
-}
-
-
-/* =========================================================
-   MOSTRAR RESULTADO
-========================================================= */
-
-function showPrediction(prediction, extracted) {
-  const box = $('prediction');
-  const warning = $('warning');
-
-  box.innerHTML = '';
-  warning.classList.add('hidden');
-
-  if (!extracted.postcode && !extracted.address) {
-    box.innerHTML = `
-      <div class="status unknown">
-        <div class="big">❓ DESTINO NÃO IDENTIFICADO</div>
-        O app não encontrou um endereço confiável
-        do cliente. Use "Corrigir destino".
-      </div>
-    `;
-
-    warning.textContent =
-      'O texto do mapa foi ignorado. ' +
-      'Não foi encontrado um Eircode ou endereço confiável.';
-
-    warning.classList.remove('hidden');
-  } else if (prediction.type === 'yes') {
-    box.innerHTML = `
-      <div class="status yes">
-        <div class="big">💶 PROVÁVEL: TEM TIP</div>
-        Histórico: ${prediction.yes}
-        ocorrência(s) com tip.
-      </div>
-    `;
-  } else if (prediction.type === 'no') {
-    box.innerHTML = `
-      <div class="status no">
-        <div class="big">SEM TIP NO HISTÓRICO</div>
-        Histórico: ${prediction.no}
-        ocorrência(s) sem tip.
-      </div>
-    `;
-  } else if (prediction.type === 'mixed') {
-    box.innerHTML = `
-      <div class="status unknown">
-        <div class="big">⚠️ HISTÓRICO INCONSISTENTE</div>
-        ${prediction.yes} com tip e
-        ${prediction.no} sem tip.
-        Não dá para afirmar com segurança.
-      </div>
-    `;
-  } else if (extracted.postcode || extracted.address) {
-    box.innerHTML = `
-      <div class="status unknown">
-        <div class="big">❓ DESTINO NOVO</div>
-        O endereço foi identificado, mas ainda
-        não existe histórico para prever a tip.
-      </div>
-    `;
-  }
-
-  let details = 'Destino reconhecido: ';
-
-  details += extracted.address
-    ? escapeHTML(extracted.address)
-    : 'não identificado';
-
-  if (extracted.postcode) {
-    details += ' · Eircode: ' +
-      escapeHTML(displayPostcode(extracted.postcode));
-  }
-
-  if (extracted.name) {
-    details += ' · Cliente: ' +
-      escapeHTML(extracted.name);
-  }
-
-  $('details').innerHTML = details;
-
-  const confidence = document.createElement('div');
-
-  confidence.className = 'confidence';
-  confidence.textContent =
-    'Confiança da identificação: ' +
-    (extracted.confidence || 'baixa');
-
-  box.appendChild(confidence);
-
-  if (extracted.multiple) {
-    warning.textContent =
-      '⚠️ Mais de um Eircode foi encontrado. ' +
-      'O app escolheu o candidato mais provável ' +
-      'com base no endereço e no contexto do texto. ' +
-      'Confirme o destino antes de coletar.';
-
-    warning.classList.remove('hidden');
-  }
-
-  updateResultButtons();
-}
-
-
-/* =========================================================
-   REGISTRO DE TIP
-========================================================= */
-
-function openLearn() {
-  if (!currentKey) {
-    alert(
-      'Primeiro identifique ou corrija o destino ' +
-      'usando "Corrigir destino".'
-    );
-
-    return;
-  }
-
-  $('learnText').textContent =
-    (
-      currentExtracted.address ||
-      'Destino não identificado'
-    ) +
-    (
-      currentExtracted.postcode
-        ? ' · ' + displayPostcode(
-            currentExtracted.postcode
-          )
-        : ''
-    );
-
-  $('learnDialog').showModal();
-}
-
-$('learnCancel').onclick = () => {
-  $('learnDialog').close();
-};
-
-async function learn(tip) {
-  if (!currentKey) {
-    alert(
-      'O destino ainda não foi identificado. ' +
-      'Use "Corrigir destino".'
-    );
-
-    return;
-  }
-
-  try {
-    await addRecord({
-      key: currentKey,
-      name: currentExtracted.name || '',
-      address: currentExtracted.address || '',
-      postcode: normalizePostcode(
-        currentExtracted.postcode || ''
-      ),
-      tip: !!tip,
-      date: new Date().toISOString()
-    });
-
-    $('learnDialog').close();
-
-    const prediction = await predict(currentKey);
-
-    showPrediction(
-      prediction,
-      currentExtracted
-    );
-
-    await updateCount();
-
-    alert('Resultado registrado com sucesso.');
-  } catch (error) {
-    console.error(error);
-    alert('Não foi possível salvar o resultado.');
-  }
-}
-
-
-/* =========================================================
-   CORREÇÃO MANUAL
-========================================================= */
-
-function openManual() {
-  $('manualAddress').value =
-    currentExtracted.address || '';
-
-  $('manualPostcode').value =
-    currentExtracted.postcode
-      ? displayPostcode(currentExtracted.postcode)
-      : '';
-
-  $('manualDialog').showModal();
-}
-
-$('manualCancel').onclick = () => {
-  $('manualDialog').close();
-};
-
-$('manualSave').onclick = async () => {
-  const address = $('manualAddress').value.trim();
-  const postcodeRaw = $('manualPostcode').value.trim();
-
-  const postcode =
-    cleanPostcode(postcodeRaw) ||
-    postcodeRaw.toUpperCase()
-      .replace(/[^A-Z0-9]/g, '');
-
-  if (!address && !postcode) {
-    alert(
-      'Digite o endereço ou o Eircode do cliente.'
-    );
-
-    return;
-  }
-
-  currentExtracted = {
-    ...currentExtracted,
-    address,
-    postcode,
-    confidence: 'manual',
-    multiple: false
-  };
-
-  currentKey = keyFor(currentExtracted);
-
-  $('manualDialog').close();
-
-  const prediction = await predict(currentKey);
-
-  showPrediction(
-    prediction,
-    currentExtracted
-  );
-};
-
-
-/* =========================================================
-   OCR — PREPROCESSAMENTO
-========================================================= */
-
-async function preprocess(file, mode = 'full') {
-  const bitmap = await createImageBitmap(file);
-  const scale = 2.4;
-
-  const canvas = document.createElement('canvas');
-
-  const ctx = canvas.getContext('2d', {
-    willReadFrequently: true
-  });
-
-  let sx = 0;
-  let sy = 0;
-  let sw = bitmap.width;
-  let sh = bitmap.height;
-
-  if (mode === 'middle') {
-    sy = Math.floor(bitmap.height * 0.20);
-    sh = Math.floor(bitmap.height * 0.65);
-  }
-
-  if (mode === 'lower') {
-    sy = Math.floor(bitmap.height * 0.40);
-    sh = Math.floor(bitmap.height * 0.60);
-  }
-
-  canvas.width = Math.min(
-    Math.floor(sw * scale),
-    3200
-  );
-
-  canvas.height = Math.min(
-    Math.floor(sh * scale),
-    4200
-  );
-
-  ctx.drawImage(
-    bitmap,
-    sx,
-    sy,
-    sw,
-    sh,
-    0,
-    0,
-    canvas.width,
-    canvas.height
-  );
-
-  const image = ctx.getImageData(
-    0,
-    0,
-    canvas.width,
-    canvas.height
-  );
-
-  for (let i = 0; i < image.data.length; i += 4) {
-    const r = image.data[i];
-    const g = image.data[i + 1];
-    const b = image.data[i + 2];
-
-    let value =
-      0.299 * r +
-      0.587 * g +
-      0.114 * b;
-
-    value = (value - 128) * 1.35 + 128;
-    value = Math.max(
-      0,
-      Math.min(255, value)
-    );
-
-    image.data[i] = value;
-    image.data[i + 1] = value;
-    image.data[i + 2] = value;
-  }
-
-  ctx.putImageData(image, 0, 0);
-
-  if (bitmap.close) {
-    bitmap.close();
-  }
-
-  return canvas;
-}
-
-
-/* =========================================================
-   OCR
-========================================================= */
-
-async function ocrPass(image, label) {
-  const result = await Tesseract.recognize(
-    image,
-    'eng',
-    {
-      logger: message => {
-        if (message.status === 'recognizing text') {
-          const pct = Math.round(
-            (message.progress || 0) * 100
-          );
-
-          $('ocrStatus').textContent =
-            `Lendo o print… ${label} ${pct}%`;
+      const unique = [];
+
+      for (const candidate of candidates) {
+        const alreadyExists = unique.some(item =>
+          item.postcode === candidate.postcode &&
+          norm(item.address) === norm(candidate.address)
+        );
+
+        if (!alreadyExists) {
+          unique.push(candidate);
         }
       }
-    }
-  );
 
-  return result.data.text || '';
-}
-
-
-/* =========================================================
-   PROCESSAMENTO PRINCIPAL
-========================================================= */
-
-async function processImage(file) {
-  if (
-    !file ||
-    !file.type ||
-    !file.type.startsWith('image/')
-  ) {
-    return;
-  }
-
-  currentImage = file;
-  currentKey = null;
-  currentExtracted = {};
-
-  $('result').classList.remove('hidden');
-  $('prediction').innerHTML = '';
-  $('details').textContent = '';
-  $('warning').classList.add('hidden');
-  $('learnBtn').classList.add('hidden');
-  $('recordBtn').classList.add('hidden');
-  $('ocrDebug').classList.add('hidden');
-
-  const img = $('preview');
-
-  if (imageUrl) {
-    URL.revokeObjectURL(imageUrl);
-  }
-
-  imageUrl = URL.createObjectURL(file);
-  img.src = imageUrl;
-
-  $('ocrStatus').textContent =
-    'Preparando OCR…';
-
-  try {
-    const full = await preprocess(file, 'full');
-    const middle = await preprocess(file, 'middle');
-    const lower = await preprocess(file, 'lower');
-
-    const texts = [];
-
-    texts.push(
-      await ocrPass(full, '(1/3)')
-    );
-
-    texts.push(
-      await ocrPass(middle, '(2/3)')
-    );
-
-    texts.push(
-      await ocrPass(lower, '(3/3)')
-    );
-
-    const text = texts.join('\n');
-
-    currentExtracted = extract(text);
-    currentKey = keyFor(currentExtracted);
-
-    $('ocrText').textContent =
-      text || '(nenhum texto reconhecido)';
-
-    $('ocrDebug').classList.remove('hidden');
-
-    $('ocrStatus').textContent =
-      'Print lido. Consultando banco local…';
-
-    const prediction = await predict(currentKey);
-
-    showPrediction(
-      prediction,
-      currentExtracted
-    );
-  } catch (error) {
-    console.error(error);
-
-    $('ocrStatus').textContent =
-      'Não consegui ler o print automaticamente. ' +
-      'Tente uma imagem original com boa resolução.';
-
-    $('prediction').innerHTML = `
-      <div class="status no">
-        Ocorreu um erro durante a leitura do print.
-        Você pode tentar novamente ou corrigir
-        o destino manualmente.
-      </div>
-    `;
-
-    $('learnBtn').classList.remove('hidden');
-  }
-}
-
-
-/* =========================================================
-   UPLOAD PELO CELULAR
-========================================================= */
-
-$('file').onchange = event => {
-  const file = event.target.files[0];
-
-  if (file) {
-    processImage(file);
-  }
-};
-
-const drop = $('drop');
-
-['dragenter', 'dragover'].forEach(eventName => {
-  drop.addEventListener(eventName, event => {
-    event.preventDefault();
-    drop.classList.add('drag');
-  });
-});
-
-['dragleave', 'drop'].forEach(eventName => {
-  drop.addEventListener(eventName, event => {
-    event.preventDefault();
-    drop.classList.remove('drag');
-  });
-});
-
-drop.addEventListener('drop', event => {
-  const file = event.dataTransfer.files[0];
-
-  if (
-    file &&
-    file.type &&
-    file.type.startsWith('image/')
-  ) {
-    processImage(file);
-  }
-});
-
-
-/* =========================================================
-   NOVO PRINT
-========================================================= */
-
-$('newBtn').onclick = () => {
-  $('result').classList.add('hidden');
-  $('file').value = '';
-
-  if (imageUrl) {
-    URL.revokeObjectURL(imageUrl);
-    imageUrl = null;
-  }
-
-  $('preview').removeAttribute('src');
-
-  currentImage = null;
-  currentKey = null;
-  currentExtracted = {};
-};
-
-
-/* =========================================================
-   BOTÕES
-========================================================= */
-
-$('learnBtn').onclick = openManual;
-$('recordBtn').onclick = openLearn;
-$('tipYes').onclick = () => learn(true);
-$('tipNo').onclick = () => learn(false);
-
-
-/* =========================================================
-   CONTADOR
-========================================================= */
-
-async function updateCount() {
-  try {
-    const records = await allRecords();
-
-    $('count').textContent =
-      `${records.length} registro` +
-      `${records.length === 1 ? '' : 's'}`;
-  } catch (error) {
-    console.error(error);
-  }
-}
-
-
-/* =========================================================
-   BANCO — RENDERIZAÇÃO
-========================================================= */
-
-async function renderDb() {
-  const records = await allRecords();
-  const el = $('dbList');
-
-  if (!records.length) {
-    el.innerHTML =
-      '<p class="empty">Banco vazio.</p>';
-
-    return;
-  }
-
-  el.innerHTML = `
-    <div style="overflow-x:auto">
-      <table>
-        <thead>
-          <tr>
-            <th>Destino</th>
-            <th>Tip</th>
-            <th>Data</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          ${records.slice().reverse().map(record => {
-            const address = escapeHTML(
-              record.address ||
-              record.postcode ||
-              '—'
-            );
-
-            const postcode = escapeHTML(
-              record.postcode || ''
-            );
-
-            const tip = record.tip
-              ? 'SIM'
-              : 'NÃO';
-
-            const date = record.date
-              ? new Date(
-                  record.date
-                ).toLocaleDateString('pt-BR')
-              : '—';
-
-            return `
-              <tr>
-                <td>
-                  ${address}
-                  ${
-                    postcode
-                      ? `<br><span class="small muted">${
-                          displayPostcode(postcode)
-                        }</span>`
-                      : ''
-                  }
-                </td>
-                <td>${tip}</td>
-                <td>${date}</td>
-              </tr>
-            `;
-          }).join('')}
-        </tbody>
-      </table>
-    </div>
-  `;
-}
-
-
-/* =========================================================
-   ABRIR E FECHAR BANCO
-========================================================= */
-
-$('dbBtn').onclick = async () => {
-  try {
-    await renderDb();
-    $('dbDialog').showModal();
-  } catch (error) {
-    console.error(error);
-    alert(
-      'Não foi possível abrir o banco de dados.'
-    );
-  }
-};
-
-$('closeDb').onclick = () => {
-  $('dbDialog').close();
-};
-
-
-/* =========================================================
-   EXPORTAR BACKUP
-========================================================= */
-
-$('exportBtn').onclick = async () => {
-  try {
-    const records = await allRecords();
-
-    const blob = new Blob(
-      [
-        JSON.stringify(
-          records,
-          null,
-          2
-        )
-      ],
-      {
-        type: 'application/json'
+      /*
+        Primeiro escolhe candidatos que possuem endereço.
+        Em caso de empate, usa o último encontrado.
+      */
+      const withAddress = unique.filter(item =>
+        item.address
+      );
+
+      let selected = null;
+
+      if (withAddress.length) {
+        selected = withAddress[withAddress.length - 1];
+      } else if (unique.length) {
+        selected = unique[unique.length - 1];
       }
-    );
 
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+      if (selected) {
+        return {
+          name: extractCustomerName(lines),
+          address: selected.address || '',
+          postcode: selected.postcode || '',
+          confidence: selected.address ? 'alta' : 'média',
+          multiple: allCodes.length > 1,
+          raw
+        };
+      }
 
-    a.href = url;
-    a.download = 'tip-check-backup.json';
-    a.click();
+      const addressCandidates = lines.filter(line => {
+        if (isMapText(line)) {
+          return false;
+        }
 
-    setTimeout(() => {
-      URL.revokeObjectURL(url);
-    }, 1000);
-  } catch (error) {
-    console.error(error);
-    alert(
-      'Não foi possível exportar o backup.'
-    );
-  }
-};
+        return looksLikeAddress(line);
+      });
 
+      if (addressCandidates.length === 1) {
+        return {
+          name: extractCustomerName(lines),
+          address: addressCandidates[0],
+          postcode: '',
+          confidence: 'média',
+          multiple: false,
+          raw
+        };
+      }
 
-/* =========================================================
-   IMPORTAR BACKUP
-========================================================= */
-
-$('importBtn').onclick = () => {
-  $('importFile').click();
-};
-
-$('importFile').onchange = async event => {
-  try {
-    const file = event.target.files[0];
-
-    if (!file) {
-      return;
+      return {
+        name: extractCustomerName(lines),
+        address: '',
+        postcode: '',
+        confidence: 'baixa',
+        multiple: addressCandidates.length > 1,
+        raw
+      };
     }
 
-    const records = JSON.parse(
-      await file.text()
-    );
+    function keyFor(extracted) {
+      if (extracted.postcode) {
+        return 'pc:' + norm(extracted.postcode);
+      }
 
-    if (!Array.isArray(records)) {
-      throw new Error('Backup inválido');
+      if (extracted.address) {
+        return 'addr:' + norm(extracted.address);
+      }
+
+      return '';
     }
 
-    await clearRecords();
+    function dbOpen() {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open(
+          DB_NAME,
+          DB_VERSION
+        );
 
-    for (const record of records) {
-      const copy = {
-        ...record
+        request.onupgradeneeded = () => {
+          const db = request.result;
+
+          if (!db.objectStoreNames.contains(STORE)) {
+            db.createObjectStore(STORE, {
+              keyPath: 'id',
+              autoIncrement: true
+            });
+          }
+        };
+
+        request.onsuccess = () => {
+          resolve(request.result);
+        };
+
+        request.onerror = () => {
+          reject(request.error);
+        };
+      });
+    }
+
+    async function allRecords() {
+      const db = await dbOpen();
+
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction(
+          STORE,
+          'readonly'
+        );
+
+        const request = transaction
+          .objectStore(STORE)
+          .getAll();
+
+        request.onsuccess = () => {
+          resolve(request.result);
+        };
+
+        request.onerror = () => {
+          reject(request.error);
+        };
+      });
+    }
+
+    async function addRecord(record) {
+      const db = await dbOpen();
+
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction(
+          STORE,
+          'readwrite'
+        );
+
+        transaction
+          .objectStore(STORE)
+          .add(record);
+
+        transaction.oncomplete = () => {
+          resolve();
+        };
+
+        transaction.onerror = () => {
+          reject(transaction.error);
+        };
+      });
+    }
+
+    async function clearRecords() {
+      const db = await dbOpen();
+
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction(
+          STORE,
+          'readwrite'
+        );
+
+        transaction
+          .objectStore(STORE)
+          .clear();
+
+        transaction.oncomplete = () => {
+          resolve();
+        };
+
+        transaction.onerror = () => {
+          reject(transaction.error);
+        };
+      });
+    }
+
+    async function predict(key) {
+      if (!key) {
+        return {
+          type: 'unknown',
+          hits: []
+        };
+      }
+
+      const records = await allRecords();
+
+      const hits = records.filter(record =>
+        record.key === key
+      );
+
+      if (!hits.length) {
+        return {
+          type: 'unknown',
+          hits: []
+        };
+      }
+
+      const yes = hits.filter(record =>
+        record.tip === true
+      ).length;
+
+      const no = hits.filter(record =>
+        record.tip === false
+      ).length;
+
+      if (yes && no) {
+        return {
+          type: 'mixed',
+          yes,
+          no,
+          hits
+        };
+      }
+
+      return {
+        type: yes ? 'yes' : 'no',
+        yes,
+        no,
+        hits
+      };
+    }
+
+    function updateResultButtons() {
+      $('learnBtn').classList.remove('hidden');
+
+      if (currentKey) {
+        $('recordBtn').classList.remove('hidden');
+      } else {
+        $('recordBtn').classList.add('hidden');
+      }
+    }
+
+    function showPrediction(prediction, extracted) {
+      const box = $('prediction');
+      const warning = $('warning');
+
+      box.innerHTML = '';
+      warning.classList.add('hidden');
+
+      if (
+        !extracted.postcode &&
+        !extracted.address
+      ) {
+        box.innerHTML = `
+          <div class="status unknown">
+            <div class="big">
+              ❓ DESTINO NÃO IDENTIFICADO
+            </div>
+
+            O app não encontrou um endereço confiável
+            do cliente. Use "Corrigir destino".
+          </div>
+        `;
+
+        warning.textContent =
+          'Não foi encontrado um Eircode ou endereço confiável.';
+
+        warning.classList.remove('hidden');
+      } else if (prediction.type === 'yes') {
+        box.innerHTML = `
+          <div class="status yes">
+            <div class="big">
+              💶 PROVÁVEL: TEM TIP
+            </div>
+
+            Histórico: ${prediction.yes}
+            ocorrência(s) com tip.
+          </div>
+        `;
+      } else if (prediction.type === 'no') {
+        box.innerHTML = `
+          <div class="status no">
+            <div class="big">
+              SEM TIP NO HISTÓRICO
+            </div>
+
+            Histórico: ${prediction.no}
+            ocorrência(s) sem tip.
+          </div>
+        `;
+      } else if (prediction.type === 'mixed') {
+        box.innerHTML = `
+          <div class="status unknown">
+            <div class="big">
+              ⚠️ HISTÓRICO INCONSISTENTE
+            </div>
+
+            ${prediction.yes} com tip e
+            ${prediction.no} sem tip.
+            Não dá para afirmar com segurança.
+          </div>
+        `;
+      } else {
+        box.innerHTML = `
+          <div class="status unknown">
+            <div class="big">
+              ❓ DESTINO NOVO
+            </div>
+
+            O destino foi identificado, mas ainda
+            não existe histórico para prever a tip.
+          </div>
+        `;
+      }
+
+      let details = 'Destino reconhecido: ';
+
+      details += extracted.address
+        ? escapeHTML(extracted.address)
+        : 'não identificado';
+
+      if (extracted.postcode) {
+        details +=
+          ' · ' + escapeHTML(extracted.postcode);
+      }
+
+      if (extracted.name) {
+        details +=
+          ' · Cliente: ' + escapeHTML(extracted.name);
+      }
+
+      $('details').innerHTML = details;
+
+      const confidence = document.createElement('div');
+
+      confidence.className = 'confidence';
+
+      confidence.textContent =
+        'Confiança da identificação: ' +
+        (extracted.confidence || 'baixa');
+
+      box.appendChild(confidence);
+
+      if (extracted.multiple) {
+        warning.textContent =
+          '⚠️ Mais de um Eircode foi encontrado. ' +
+          'Confirme se o destino mostrado é o cliente ' +
+          'antes de coletar.';
+        warning.classList.remove('hidden');
+      }
+
+      updateResultButtons();
+    }
+
+    function openManual() {
+      $('manualAddress').value =
+        currentExtracted.address || '';
+
+      $('manualPostcode').value =
+        currentExtracted.postcode || '';
+
+      $('manualDialog').showModal();
+    }
+
+    function openLearn() {
+      if (!currentKey) {
+        alert(
+          'Primeiro identifique ou corrija o destino.'
+        );
+        return;
+      }
+
+      $('learnText').textContent =
+        (
+          currentExtracted.address ||
+          'Destino não identificado'
+        ) +
+        (
+          currentExtracted.postcode
+            ? ' · ' + currentExtracted.postcode
+            : ''
+        );
+
+      $('learnDialog').showModal();
+    }
+
+    async function learn(tip) {
+      if (!currentKey) {
+        alert(
+          'O destino ainda não foi identificado.'
+        );
+        return;
+      }
+
+      try {
+        await addRecord({
+          key: currentKey,
+          name: currentExtracted.name || '',
+          address: currentExtracted.address || '',
+          postcode: currentExtracted.postcode || '',
+          tip: Boolean(tip),
+          date: new Date().toISOString()
+        });
+
+        $('learnDialog').close();
+
+        const prediction = await predict(currentKey);
+
+        showPrediction(
+          prediction,
+          currentExtracted
+        );
+
+        await updateCount();
+
+        alert('Resultado registrado com sucesso.');
+      } catch (error) {
+        console.error(error);
+        alert('Não foi possível salvar o resultado.');
+      }
+    }
+
+    async function preprocess(file, mode) {
+      const bitmap = await createImageBitmap(file);
+
+      const scale = 2.4;
+      const canvas = document.createElement('canvas');
+
+      const context = canvas.getContext('2d', {
+        willReadFrequently: true
+      });
+
+      let sx = 0;
+      let sy = 0;
+      let sw = bitmap.width;
+      let sh = bitmap.height;
+
+      if (mode === 'middle') {
+        sy = Math.floor(bitmap.height * 0.20);
+        sh = Math.floor(bitmap.height * 0.65);
+      }
+
+      if (mode === 'lower') {
+        sy = Math.floor(bitmap.height * 0.40);
+        sh = Math.floor(bitmap.height * 0.60);
+      }
+
+      canvas.width = Math.min(
+        Math.floor(sw * scale),
+        3200
+      );
+
+      canvas.height = Math.min(
+        Math.floor(sh * scale),
+        4200
+      );
+
+      context.drawImage(
+        bitmap,
+        sx,
+        sy,
+        sw,
+        sh,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      );
+
+      const image = context.getImageData(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      );
+
+      for (let i = 0; i < image.data.length; i += 4) {
+        const r = image.data[i];
+        const g = image.data[i + 1];
+        const b = image.data[i + 2];
+
+        let value =
+          0.299 * r +
+          0.587 * g +
+          0.114 * b;
+
+        value = (value - 128) * 1.35 + 128;
+        value = Math.max(
+          0,
+          Math.min(255, value)
+        );
+
+        image.data[i] = value;
+        image.data[i + 1] = value;
+        image.data[i + 2] = value;
+      }
+
+      context.putImageData(image, 0, 0);
+
+      return canvas;
+    }
+
+    async function ocrPass(image, label) {
+      const result = await Tesseract.recognize(
+        image,
+        'eng',
+        {
+          logger: message => {
+            if (
+              message.status === 'recognizing text'
+            ) {
+              const percentage = Math.round(
+                (message.progress || 0) * 100
+              );
+
+              $('ocrStatus').textContent =
+                'Lendo o print… ' +
+                label +
+                ' ' +
+                percentage +
+                '%';
+            }
+          }
+        }
+      );
+
+      return result.data.text || '';
+    }
+
+    async function processImage(file) {
+      if (
+        !file ||
+        !file.type.startsWith('image/')
+      ) {
+        return;
+      }
+
+      currentImage = file;
+      currentKey = '';
+      currentExtracted = {};
+
+      $('result').classList.remove('hidden');
+      $('prediction').innerHTML = '';
+      $('details').textContent = '';
+      $('warning').classList.add('hidden');
+      $('learnBtn').classList.add('hidden');
+      $('recordBtn').classList.add('hidden');
+      $('ocrDebug').classList.add('hidden');
+
+      if (imageUrl) {
+        URL.revokeObjectURL(imageUrl);
+      }
+
+      imageUrl = URL.createObjectURL(file);
+      $('preview').src = imageUrl;
+
+      $('ocrStatus').textContent =
+        'Preparando OCR…';
+
+      try {
+        const full = await preprocess(file, 'full');
+        const middle = await preprocess(file, 'middle');
+        const lower = await preprocess(file, 'lower');
+
+        const texts = [];
+
+        texts.push(
+          await ocrPass(full, '(1/3)')
+        );
+
+        texts.push(
+          await ocrPass(middle, '(2/3)')
+        );
+
+        texts.push(
+          await ocrPass(lower, '(3/3)')
+        );
+
+        const text = texts.join('\n');
+
+        currentExtracted = extract(text);
+        currentKey = keyFor(currentExtracted);
+
+        $('ocrText').textContent =
+          text || '(nenhum texto reconhecido)';
+
+        $('ocrDebug').classList.remove('hidden');
+
+        $('ocrStatus').textContent =
+          'Print lido. Consultando banco local…';
+
+        const prediction = await predict(currentKey);
+
+        showPrediction(
+          prediction,
+          currentExtracted
+        );
+      } catch (error) {
+        console.error(error);
+
+        $('ocrStatus').textContent =
+          'Não consegui ler o print automaticamente.';
+
+        $('prediction').innerHTML = `
+          <div class="status no">
+            Ocorreu um erro durante a leitura.
+            Tente outro print ou corrija o destino
+            manualmente.
+          </div>
+        `;
+
+        $('learnBtn').classList.remove('hidden');
+      }
+    }
+
+    async function updateCount() {
+      try {
+        const records = await allRecords();
+
+        $('count').textContent =
+          records.length +
+          ' registro' +
+          (records.length === 1 ? '' : 's');
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    async function renderDb() {
+      const records = await allRecords();
+
+      if (!records.length) {
+        $('dbList').innerHTML =
+          '<p class="empty">Banco vazio.</p>';
+        return;
+      }
+
+      $('dbList').innerHTML = `
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Destino</th>
+                <th>Tip</th>
+                <th>Data</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              ${records.slice().reverse().map(record => {
+                const address = escapeHTML(
+                  record.address ||
+                  record.postcode ||
+                  '—'
+                );
+
+                const postcode = escapeHTML(
+                  record.postcode || ''
+                );
+
+                const tip = record.tip
+                  ? 'SIM'
+                  : 'NÃO';
+
+                const date = record.date
+                  ? new Date(
+                      record.date
+                    ).toLocaleDateString('pt-BR')
+                  : '—';
+
+                return `
+                  <tr>
+                    <td>
+                      ${address}
+                      ${
+                        postcode
+                          ? '<br><span class="small muted">' +
+                            postcode +
+                            '</span>'
+                          : ''
+                      }
+                    </td>
+                    <td>${tip}</td>
+                    <td>${date}</td>
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    $('file').onchange = event => {
+      const file = event.target.files[0];
+
+      if (file) {
+        processImage(file);
+      }
+    };
+
+    const drop = $('drop');
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+      drop.addEventListener(eventName, event => {
+        event.preventDefault();
+        drop.classList.add('drag');
+      });
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      drop.addEventListener(eventName, event => {
+        event.preventDefault();
+        drop.classList.remove('drag');
+      });
+    });
+
+    drop.addEventListener('drop', event => {
+      const file = event.dataTransfer.files[0];
+
+      if (
+        file &&
+        file.type.startsWith('image/')
+      ) {
+        processImage(file);
+      }
+    });
+
+    $('newBtn').onclick = () => {
+      $('result').classList.add('hidden');
+      $('file').value = '';
+
+      if (imageUrl) {
+        URL.revokeObjectURL(imageUrl);
+        imageUrl = null;
+      }
+
+      $('preview').removeAttribute('src');
+
+      currentImage = null;
+      currentKey = '';
+      currentExtracted = {};
+    };
+
+    $('learnBtn').onclick = openManual;
+    $('recordBtn').onclick = openLearn;
+
+    $('tipYes').onclick = () => {
+      learn(true);
+    };
+
+    $('tipNo').onclick = () => {
+      learn(false);
+    };
+
+    $('learnCancel').onclick = () => {
+      $('learnDialog').close();
+    };
+
+    $('manualCancel').onclick = () => {
+      $('manualDialog').close();
+    };
+
+    $('manualSave').onclick = async () => {
+      const address = $('manualAddress')
+        .value
+        .trim();
+
+      const postcode = cleanPostcode(
+        $('manualPostcode').value.trim()
+      );
+
+      if (!address && !postcode) {
+        alert(
+          'Digite o endereço ou o Eircode do cliente.'
+        );
+        return;
+      }
+
+      currentExtracted = {
+        ...currentExtracted,
+        address,
+        postcode,
+        confidence: 'manual',
+        multiple: false
       };
 
-      delete copy.id;
+      currentKey = keyFor(currentExtracted);
 
-      await addRecord(copy);
+      $('manualDialog').close();
+
+      const prediction = await predict(currentKey);
+
+      showPrediction(
+        prediction,
+        currentExtracted
+      );
+    };
+
+    $('dbBtn').onclick = async () => {
+      try {
+        await renderDb();
+        $('dbDialog').showModal();
+      } catch (error) {
+        console.error(error);
+        alert(
+          'Não foi possível abrir o banco de dados.'
+        );
+      }
+    };
+
+    $('closeDb').onclick = () => {
+      $('dbDialog').close();
+    };
+
+    $('exportBtn').onclick = async () => {
+      try {
+        const records = await allRecords();
+
+        const blob = new Blob(
+          [
+            JSON.stringify(records, null, 2)
+          ],
+          {
+            type: 'application/json'
+          }
+        );
+
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+
+        link.href = url;
+        link.download = 'tip-check-backup.json';
+        link.click();
+
+        setTimeout(() => {
+          URL.revokeObjectURL(url);
+        }, 1000);
+      } catch (error) {
+        console.error(error);
+        alert(
+          'Não foi possível exportar o backup.'
+        );
+      }
+    };
+
+    $('importBtn').onclick = () => {
+      $('importFile').click();
+    };
+
+    $('importFile').onchange = async event => {
+      try {
+        const file = event.target.files[0];
+
+        if (!file) {
+          return;
+        }
+
+        const records = JSON.parse(
+          await file.text()
+        );
+
+        if (!Array.isArray(records)) {
+          throw new Error('Backup inválido');
+        }
+
+        await clearRecords();
+
+        for (const record of records) {
+          const copy = {
+            ...record
+          };
+
+          delete copy.id;
+
+          await addRecord(copy);
+        }
+
+        await renderDb();
+        await updateCount();
+
+        alert(
+          'Backup importado com sucesso.'
+        );
+      } catch (error) {
+        console.error(error);
+        alert(
+          'Não foi possível importar este backup.'
+        );
+      } finally {
+        event.target.value = '';
+      }
+    };
+
+    $('clearBtn').onclick = async () => {
+      if (
+        !confirm(
+          'Apagar todos os registros?'
+        )
+      ) {
+        return;
+      }
+
+      try {
+        await clearRecords();
+        await renderDb();
+        await updateCount();
+
+        alert('Banco apagado.');
+      } catch (error) {
+        console.error(error);
+        alert(
+          'Não foi possível apagar o banco.'
+        );
+      }
+    };
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js')
+        .catch(error => {
+          console.warn(
+            'Service Worker não registrado:',
+            error
+          );
+        });
     }
 
-    await renderDb();
-    await updateCount();
-
-    alert(
-      'Backup importado com sucesso.'
-    );
-  } catch (error) {
-    console.error(error);
-    alert(
-      'Não foi possível importar este backup.'
-    );
-  } finally {
-    event.target.value = '';
-  }
-};
-
-
-/* =========================================================
-   APAGAR BANCO
-========================================================= */
-
-$('clearBtn').onclick = async () => {
-  if (!confirm('Apagar todos os registros?')) {
-    return;
-  }
-
-  try {
-    await clearRecords();
-    await renderDb();
-    await updateCount();
-
-    alert('Banco apagado.');
-  } catch (error) {
-    console.error(error);
-    alert(
-      'Não foi possível apagar o banco.'
-    );
-  }
-};
-
-
-/* =========================================================
-   SERVICE WORKER
-========================================================= */
-
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js')
-    .catch(error => {
-      console.error(
-        'Service Worker não registrado:',
-        error
-      );
-    });
-}
-
-
-/* =========================================================
-   INICIALIZAÇÃO
-========================================================= */
-
-updateCount();
-</script>
-
+    updateCount();
+  </script>
 </body>
 </html>
