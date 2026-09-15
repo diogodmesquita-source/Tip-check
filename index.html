@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="pt-BR">
 <head>
@@ -20,7 +21,9 @@
       background: #111;
     }
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       margin: 0;
@@ -43,9 +46,14 @@
       gap: 12px;
     }
 
-    h1 { font-size: 28px; margin: 0; }
+    h1 {
+      font-size: 28px;
+      margin: 0;
+    }
 
-    h2 { margin-top: 0; }
+    h2 {
+      margin-top: 0;
+    }
 
     .sub {
       color: #a7a7ad;
@@ -106,7 +114,9 @@
       color: #fff;
     }
 
-    button:disabled { opacity: .5; }
+    button:disabled {
+      opacity: .5;
+    }
 
     .actions {
       display: flex;
@@ -115,7 +125,9 @@
       justify-content: center;
     }
 
-    .hidden { display: none !important; }
+    .hidden {
+      display: none !important;
+    }
 
     .preview {
       width: 100%;
@@ -162,7 +174,9 @@
       margin: 0 0 6px;
     }
 
-    .muted { color: #aaa; }
+    .muted {
+      color: #aaa;
+    }
 
     .row {
       display: flex;
@@ -178,7 +192,9 @@
       font-size: 12px;
     }
 
-    input[type=file] { display: none; }
+    input[type=file] {
+      display: none;
+    }
 
     .filebtn {
       display: inline-block;
@@ -191,13 +207,16 @@
       font-size: 13px;
     }
 
-    td, th {
+    td,
+    th {
       text-align: left;
       padding: 9px 5px;
       border-bottom: 1px solid #3b3b3e;
     }
 
-    .small { font-size: 12px; }
+    .small {
+      font-size: 12px;
+    }
 
     .footer {
       color: #777;
@@ -226,7 +245,9 @@
       padding: 20px;
     }
 
-    dialog::backdrop { background: #000b; }
+    dialog::backdrop {
+      background: #000b;
+    }
 
     dialog input[type=text] {
       width: 100%;
@@ -254,7 +275,6 @@
 </head>
 
 <body>
-
 <div class="app">
 
   <header>
@@ -265,8 +285,6 @@
 
     <button class="secondary" id="dbBtn">Banco</button>
   </header>
-
-  <!-- UPLOAD -->
 
   <section class="card">
     <div id="drop" class="drop">
@@ -287,10 +305,7 @@
     </div>
   </section>
 
-  <!-- RESULTADO -->
-
   <section id="result" class="card hidden">
-
     <img id="preview" class="preview" alt="Print selecionado">
 
     <div id="ocrStatus" class="status info">
@@ -298,18 +313,15 @@
     </div>
 
     <div id="prediction"></div>
-
     <div id="details" class="small muted"></div>
-
     <div id="warning" class="status warning hidden"></div>
 
     <details id="ocrDebug" class="small hidden">
-      <summary>Texto reconhecido (diagnóstico)</summary>
+      <summary>Texto reconhecido — diagnóstico</summary>
       <div id="ocrText" class="debug"></div>
     </details>
 
     <div class="actions" style="margin-top:14px">
-
       <button id="newBtn" class="secondary">
         Novo print
       </button>
@@ -321,15 +333,10 @@
       <button id="recordBtn" class="secondary hidden">
         Registrar tip
       </button>
-
     </div>
-
   </section>
 
-  <!-- COMO FUNCIONA -->
-
   <section class="card">
-
     <div class="row">
       <strong>Como funciona</strong>
 
@@ -341,40 +348,30 @@
     <div class="muted small">
       O app não tenta ler a tip do print.
 
-      Ele procura primeiro o Eircode do cliente,
-      porque ele é a identificação mais confiável
-      do destino.
-
+      Ele procura o Eircode e o endereço do cliente.
       Textos do mapa, como parques, bairros,
-      nomes de estradas e pontos de interesse,
-      são ignorados.
+      estradas e pontos de interesse, são ignorados.
 
       Quando o destino é novo, você pode corrigir
       o endereço e, depois da coleta, registrar
-      se houve tip. O app aprende com o histórico.
+      se houve tip.
 
       Os dados ficam armazenados neste dispositivo.
     </div>
-
   </section>
 
   <div class="footer">
     Dados armazenados neste iPhone.
     Nenhum print é enviado para um servidor por este app.
   </div>
-
 </div>
 
-<!-- BANCO -->
-
 <dialog id="dbDialog">
-
   <h2>Banco de dados</h2>
 
   <div id="dbList"></div>
 
   <div class="actions" style="margin-top:16px">
-
     <button id="exportBtn" class="secondary">
       Exportar backup
     </button>
@@ -390,7 +387,6 @@
     <button id="closeDb" class="secondary">
       Fechar
     </button>
-
   </div>
 
   <input
@@ -399,13 +395,9 @@
     accept=".json,application/json"
     class="hidden"
   >
-
 </dialog>
 
-<!-- REGISTRAR TIP -->
-
 <dialog id="learnDialog">
-
   <h2>Registrar resultado</h2>
 
   <p class="muted">
@@ -420,7 +412,6 @@
   </p>
 
   <div class="actions">
-
     <button id="tipYes">
       Sim, teve tip
     </button>
@@ -428,23 +419,16 @@
     <button id="tipNo" class="danger">
       Não teve tip
     </button>
-
   </div>
 
   <div class="actions" style="margin-top:14px">
-
     <button id="learnCancel" class="secondary">
       Cancelar
     </button>
-
   </div>
-
 </dialog>
 
-<!-- CORREÇÃO MANUAL -->
-
 <dialog id="manualDialog">
-
   <h2>Corrigir destino</h2>
 
   <p class="muted small">
@@ -460,7 +444,7 @@
   <input
     id="manualAddress"
     type="text"
-    placeholder="Ex.: Garters Lane, Saggart"
+    placeholder="Ex.: 1 Templeogue Rd, Bushy Park House"
   >
 
   <label class="small" for="manualPostcode">
@@ -470,11 +454,10 @@
   <input
     id="manualPostcode"
     type="text"
-    placeholder="Ex.: D24Y928"
+    placeholder="Ex.: D6W YE27"
   >
 
   <div class="actions" style="margin-top:14px">
-
     <button id="manualSave">
       Salvar destino
     </button>
@@ -482,9 +465,7 @@
     <button id="manualCancel" class="secondary">
       Cancelar
     </button>
-
   </div>
-
 </dialog>
 
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
@@ -590,7 +571,7 @@ async function clearRecords() {
 ========================================================= */
 
 function norm(text) {
-  return (text || '')
+  return String(text || '')
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
@@ -600,7 +581,7 @@ function norm(text) {
 }
 
 function normalizeOcr(text) {
-  return (text || '')
+  return String(text || '')
     .replace(/[“”"]/g, '')
     .replace(/\r/g, '\n')
     .replace(/[ \t]+/g, ' ')
@@ -609,7 +590,7 @@ function normalizeOcr(text) {
 }
 
 function cleanLine(text) {
-  return (text || '')
+  return String(text || '')
     .replace(/[|]/g, 'I')
     .replace(/[<>«»←→]/g, ' ')
     .replace(/\s+/g, ' ')
@@ -619,24 +600,48 @@ function cleanLine(text) {
 
 
 /* =========================================================
-   EIRCODE
+   EIRCODE — VERSÃO CORRIGIDA
 ========================================================= */
 
-function findEircodes(text) {
-  const upper = (text || '')
+function normalizePostcode(code) {
+  const clean = String(code || '')
     .toUpperCase()
-    .replace(/[^A-Z0-9\s]/g, ' ');
+    .replace(/[^A-Z0-9]/g, '');
+
+  if (!/^[A-Z]\d{2}[A-Z0-9]{4}$/.test(clean)) {
+    return '';
+  }
+
+  return clean;
+}
+
+function displayPostcode(code) {
+  const normalized = normalizePostcode(code);
+
+  if (!normalized) {
+    return '';
+  }
+
+  return normalized.slice(0, 3) + ' ' + normalized.slice(3);
+}
+
+function findEircodes(text) {
+  const upper = String(text || '')
+    .toUpperCase()
+    .replace(/[‐-‒–—]/g, '-')
+    .replace(/[^A-Z0-9\s-]/g, ' ');
 
   const results = [];
-  const regex = /\b([A-Z]\s*\d{2})\s*([A-Z0-9]{4})\b/g;
+  const regex = /\b([A-Z]\d{2})[\s-]*([A-Z0-9]{4})\b/g;
 
   let match;
 
   while ((match = regex.exec(upper)) !== null) {
-    const code = (match[1] + match[2])
-      .replace(/\s+/g, '');
+    const code = normalizePostcode(
+      match[1] + match[2]
+    );
 
-    if (!results.includes(code)) {
+    if (code && !results.includes(code)) {
       results.push(code);
     }
   }
@@ -644,18 +649,34 @@ function findEircodes(text) {
   return results;
 }
 
+function removeEircodes(text) {
+  return String(text || '')
+    .replace(
+      /\b[A-Z]\s*\d{2}[\s-]*[A-Z0-9]\s*[A-Z0-9]\s*[A-Z0-9]\s*[A-Z0-9]\b/gi,
+      ' '
+    )
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 function cleanPostcode(text) {
   const codes = findEircodes(text);
-  return codes.length ? codes[codes.length - 1] : '';
+
+  if (codes.length) {
+    return codes[0];
+  }
+
+  return normalizePostcode(text);
 }
 
 
 /* =========================================================
-   DETECÇÃO DE TEXTOS DO MAPA
+   TEXTOS DO MAPA
 ========================================================= */
 
 const mapWords = [
   'phoenix park',
+  'bushy park',
   'rathfarnham',
   'tallaght',
   'ballyfermot',
@@ -674,17 +695,26 @@ const mapWords = [
   'google',
   'map',
   'dublin',
-  'harbour'
+  'harbour',
+  'rathgar',
+  'terenure',
+  'milltown',
+  'rathmines',
+  'rathcoole',
+  'hospital',
+  'park'
 ];
 
 function isMapText(line) {
   const n = norm(line);
 
-  if (!n) return false;
+  if (!n) {
+    return false;
+  }
 
-  return mapWords.some(word =>
-    n.includes(norm(word))
-  );
+  return mapWords.some(word => {
+    return n.includes(norm(word));
+  });
 }
 
 
@@ -693,18 +723,42 @@ function isMapText(line) {
 ========================================================= */
 
 const roadWords = [
-  'road', 'rd', 'avenue', 'ave', 'street', 'st',
-  'lane', 'ln', 'drive', 'dr', 'close', 'crescent',
-  'grove', 'terrace', 'park', 'way', 'court', 'ct',
-  'square', 'place', 'gardens', 'lawn', 'view',
-  'walk', 'rise'
+  'road',
+  'rd',
+  'avenue',
+  'ave',
+  'street',
+  'st',
+  'lane',
+  'ln',
+  'drive',
+  'dr',
+  'close',
+  'crescent',
+  'grove',
+  'terrace',
+  'park',
+  'way',
+  'court',
+  'ct',
+  'square',
+  'place',
+  'gardens',
+  'lawn',
+  'view',
+  'walk',
+  'rise'
 ];
 
 function hasRoadWord(text) {
   const n = norm(text);
 
   return roadWords.some(word => {
-    const pattern = new RegExp('\\b' + word + '\\b', 'i');
+    const pattern = new RegExp(
+      '\\b' + word + '\\b',
+      'i'
+    );
+
     return pattern.test(n);
   });
 }
@@ -712,7 +766,9 @@ function hasRoadWord(text) {
 function looksLikeAddress(text) {
   const line = cleanLine(text);
 
-  if (!line || isMapText(line)) return false;
+  if (!line || isMapText(line)) {
+    return false;
+  }
 
   const hasNumber = /\b\d{1,5}\b/.test(line);
   const hasRoad = hasRoadWord(line);
@@ -722,10 +778,10 @@ function looksLikeAddress(text) {
 
 
 /* =========================================================
-   EXTRAÇÃO INTELIGENTE
+   NOME DO CLIENTE
 ========================================================= */
 
-function extractCustomerName(lines) {
+function extractCustomerName(lines, preferredIndex = -1) {
   const blocked = [
     'go to customer',
     'delivery complete',
@@ -735,25 +791,81 @@ function extractCustomerName(lines) {
     'travel',
     'accept and go',
     'hyderabadi kitchen',
-    'camden'
+    'camden',
+    'customer',
+    'order',
+    'delivery',
+    'templeogue',
+    'bushy park'
   ];
 
+  function isPossibleName(line) {
+    const cleaned = cleanLine(line);
+    const n = norm(cleaned);
+
+    if (!cleaned || !n) {
+      return false;
+    }
+
+    if (isMapText(cleaned)) {
+      return false;
+    }
+
+    if (blocked.some(word => n.includes(norm(word)))) {
+      return false;
+    }
+
+    if (/\d/.test(cleaned)) {
+      return false;
+    }
+
+    if (hasRoadWord(cleaned)) {
+      return false;
+    }
+
+    return /^[A-Za-zÀ-ÿ' -]{3,60}$/.test(cleaned);
+  }
+
+  /*
+    Primeiro procura perto do Eircode selecionado.
+  */
+
+  if (preferredIndex >= 0) {
+    for (let distance = 1; distance <= 4; distance++) {
+      const indexes = [
+        preferredIndex - distance,
+        preferredIndex + distance
+      ];
+
+      for (const index of indexes) {
+        if (index < 0 || index >= lines.length) {
+          continue;
+        }
+
+        if (isPossibleName(lines[index])) {
+          return lines[index];
+        }
+      }
+    }
+  }
+
+  /*
+    Fallback: procura no restante do texto.
+  */
+
   for (const line of lines) {
-    const n = norm(line);
-
-    if (!n) continue;
-
-    if (blocked.some(x => n.includes(norm(x)))) continue;
-    if (isMapText(line)) continue;
-    if (/\d/.test(line)) continue;
-
-    if (/^[A-Za-zÀ-ÿ' -]{3,40}$/.test(line)) {
+    if (isPossibleName(line)) {
       return line;
     }
   }
 
   return '';
 }
+
+
+/* =========================================================
+   EXTRAÇÃO INTELIGENTE DO DESTINO
+========================================================= */
 
 function extract(text) {
   const raw = normalizeOcr(text);
@@ -763,105 +875,172 @@ function extract(text) {
     .map(cleanLine)
     .filter(Boolean);
 
-  const eircodes = findEircodes(raw);
+  const allEircodes = findEircodes(raw);
   const candidates = [];
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     const codes = findEircodes(line);
 
-    if (!codes.length) continue;
-
-    const postcode = codes[0];
-    let address = '';
-
-    const sameLine = line
-      .replace(
-        new RegExp(
-          postcode.slice(0, 3) +
-          '\\s*' +
-          postcode.slice(3),
-          'i'
-        ),
-        ''
-      )
-      .trim();
-
-    if (sameLine && looksLikeAddress(sameLine)) {
-      address = sameLine;
+    if (!codes.length) {
+      continue;
     }
 
-    if (!address && i > 0) {
-      const previous = lines[i - 1];
+    for (const postcode of codes) {
+      let address = '';
+      let score = 0;
+
+      /*
+        Caso o endereço e o Eircode estejam na mesma linha.
+      */
+
+      const sameLine = removeEircodes(line);
 
       if (
-        !isMapText(previous) &&
-        looksLikeAddress(previous)
+        sameLine &&
+        !isMapText(sameLine) &&
+        looksLikeAddress(sameLine)
       ) {
-        address = previous;
+        address = sameLine;
+        score += 25;
       }
-    }
 
-    if (!address && i > 1) {
-      const previous2 = lines[i - 2];
+      /*
+        Procura endereço nas linhas próximas.
+      */
 
-      if (
-        !isMapText(previous2) &&
-        looksLikeAddress(previous2)
-      ) {
-        address = previous2;
-      }
-    }
+      for (const distance of [1, 2, 3]) {
+        const previousIndex = i - distance;
+        const nextIndex = i + distance;
 
-    if (!address) {
-      const nearby = [];
+        if (previousIndex >= 0) {
+          const previous = lines[previousIndex];
 
-      for (
-        let j = Math.max(0, i - 3);
-        j <= Math.min(lines.length - 1, i + 1);
-        j++
-      ) {
-        if (j === i || isMapText(lines[j])) continue;
+          if (
+            !isMapText(previous) &&
+            looksLikeAddress(previous)
+          ) {
+            if (!address) {
+              address = previous;
+            }
 
-        if (
-          /\b\d{1,5}\b/.test(lines[j]) ||
-          hasRoadWord(lines[j])
-        ) {
-          nearby.push(lines[j]);
+            score += Math.max(1, 14 - distance * 2);
+          }
+        }
+
+        if (nextIndex < lines.length) {
+          const next = lines[nextIndex];
+
+          if (
+            !isMapText(next) &&
+            looksLikeAddress(next)
+          ) {
+            if (!address) {
+              address = next;
+            }
+
+            score += Math.max(1, 10 - distance * 2);
+          }
         }
       }
 
-      if (nearby.length) {
-        address = nearby.join(', ');
+      /*
+        Um Eircode associado a um endereço recebe prioridade.
+      */
+
+      if (address) {
+        score += 15;
       }
+
+      /*
+        Penaliza Eircodes em linhas do mapa.
+      */
+
+      if (isMapText(line)) {
+        score -= 40;
+      }
+
+      /*
+        Pontuação adicional para linhas com número e rua.
+      */
+
+      if (/\b\d{1,5}\b/.test(line)) {
+        score += 5;
+      }
+
+      if (hasRoadWord(line)) {
+        score += 5;
+      }
+
+      candidates.push({
+        postcode,
+        address,
+        lineIndex: i,
+        score
+      });
     }
-
-    candidates.push({
-      postcode,
-      address,
-      lineIndex: i
-    });
   }
 
-  let selected = null;
+  /*
+    Mantém somente o melhor candidato de cada Eircode.
+  */
 
-  if (candidates.length) {
-    selected = candidates[candidates.length - 1];
+  const bestByPostcode = new Map();
+
+  for (const candidate of candidates) {
+    const previous = bestByPostcode.get(candidate.postcode);
+
+    if (
+      !previous ||
+      candidate.score > previous.score
+    ) {
+      bestByPostcode.set(
+        candidate.postcode,
+        candidate
+      );
+    }
   }
+
+  const uniqueCandidates = Array.from(
+    bestByPostcode.values()
+  );
+
+  uniqueCandidates.sort((a, b) => {
+    return b.score - a.score;
+  });
+
+  const selected = uniqueCandidates[0] || null;
 
   if (selected) {
+    const confidence =
+      selected.score >= 35
+        ? 'alta'
+        : selected.score >= 18
+          ? 'média'
+          : 'baixa';
+
     return {
-      name: extractCustomerName(lines),
+      name: extractCustomerName(
+        lines,
+        selected.lineIndex
+      ),
       address: selected.address || '',
       postcode: selected.postcode,
-      confidence: selected.address ? 'alta' : 'média',
-      multiple: eircodes.length > 1,
+      confidence,
+      multiple: allEircodes.length > 1,
       raw
     };
   }
 
+  /*
+    Fallback: endereço reconhecido sem Eircode.
+  */
+
   const addressCandidates = lines.filter(line => {
-    if (isMapText(line)) return false;
+    if (isMapText(line)) {
+      return false;
+    }
+
     return looksLikeAddress(line);
   });
 
@@ -892,8 +1071,12 @@ function extract(text) {
 ========================================================= */
 
 function keyFor(extracted) {
-  if (extracted.postcode) {
-    return 'pc:' + norm(extracted.postcode);
+  const postcode = normalizePostcode(
+    extracted.postcode || ''
+  );
+
+  if (postcode) {
+    return 'pc:' + norm(postcode);
   }
 
   if (extracted.address) {
@@ -910,21 +1093,39 @@ function keyFor(extracted) {
 
 async function predict(key) {
   if (!key) {
-    return { type: 'unknown', hits: [] };
+    return {
+      type: 'unknown',
+      hits: []
+    };
   }
 
   const records = await allRecords();
-  const hits = records.filter(r => r.key === key);
+  const hits = records.filter(record => {
+    return record.key === key;
+  });
 
   if (!hits.length) {
-    return { type: 'unknown', hits: [] };
+    return {
+      type: 'unknown',
+      hits: []
+    };
   }
 
-  const yes = hits.filter(r => r.tip === true).length;
-  const no = hits.filter(r => r.tip === false).length;
+  const yes = hits.filter(record => {
+    return record.tip === true;
+  }).length;
+
+  const no = hits.filter(record => {
+    return record.tip === false;
+  }).length;
 
   if (yes && no) {
-    return { type: 'mixed', yes, no, hits };
+    return {
+      type: 'mixed',
+      yes,
+      no,
+      hits
+    };
   }
 
   return {
@@ -976,9 +1177,7 @@ function showPrediction(prediction, extracted) {
       'Não foi encontrado um Eircode ou endereço confiável.';
 
     warning.classList.remove('hidden');
-  }
-
-  else if (prediction.type === 'yes') {
+  } else if (prediction.type === 'yes') {
     box.innerHTML = `
       <div class="status yes">
         <div class="big">💶 PROVÁVEL: TEM TIP</div>
@@ -986,9 +1185,7 @@ function showPrediction(prediction, extracted) {
         ocorrência(s) com tip.
       </div>
     `;
-  }
-
-  else if (prediction.type === 'no') {
+  } else if (prediction.type === 'no') {
     box.innerHTML = `
       <div class="status no">
         <div class="big">SEM TIP NO HISTÓRICO</div>
@@ -996,9 +1193,7 @@ function showPrediction(prediction, extracted) {
         ocorrência(s) sem tip.
       </div>
     `;
-  }
-
-  else if (prediction.type === 'mixed') {
+  } else if (prediction.type === 'mixed') {
     box.innerHTML = `
       <div class="status unknown">
         <div class="big">⚠️ HISTÓRICO INCONSISTENTE</div>
@@ -1007,9 +1202,7 @@ function showPrediction(prediction, extracted) {
         Não dá para afirmar com segurança.
       </div>
     `;
-  }
-
-  else if (extracted.postcode || extracted.address) {
+  } else if (extracted.postcode || extracted.address) {
     box.innerHTML = `
       <div class="status unknown">
         <div class="big">❓ DESTINO NOVO</div>
@@ -1026,11 +1219,13 @@ function showPrediction(prediction, extracted) {
     : 'não identificado';
 
   if (extracted.postcode) {
-    details += ' · ' + escapeHTML(extracted.postcode);
+    details += ' · Eircode: ' +
+      escapeHTML(displayPostcode(extracted.postcode));
   }
 
   if (extracted.name) {
-    details += ' · Cliente: ' + escapeHTML(extracted.name);
+    details += ' · Cliente: ' +
+      escapeHTML(extracted.name);
   }
 
   $('details').innerHTML = details;
@@ -1047,7 +1242,8 @@ function showPrediction(prediction, extracted) {
   if (extracted.multiple) {
     warning.textContent =
       '⚠️ Mais de um Eircode foi encontrado. ' +
-      'O app usou o último Eircode encontrado. ' +
+      'O app escolheu o candidato mais provável ' +
+      'com base no endereço e no contexto do texto. ' +
       'Confirme o destino antes de coletar.';
 
     warning.classList.remove('hidden');
@@ -1058,7 +1254,7 @@ function showPrediction(prediction, extracted) {
 
 
 /* =========================================================
-   DIALOG DE REGISTRO
+   REGISTRO DE TIP
 ========================================================= */
 
 function openLearn() {
@@ -1067,6 +1263,7 @@ function openLearn() {
       'Primeiro identifique ou corrija o destino ' +
       'usando "Corrigir destino".'
     );
+
     return;
   }
 
@@ -1077,7 +1274,9 @@ function openLearn() {
     ) +
     (
       currentExtracted.postcode
-        ? ' · ' + currentExtracted.postcode
+        ? ' · ' + displayPostcode(
+            currentExtracted.postcode
+          )
         : ''
     );
 
@@ -1088,17 +1287,13 @@ $('learnCancel').onclick = () => {
   $('learnDialog').close();
 };
 
-
-/* =========================================================
-   APRENDER TIP
-========================================================= */
-
 async function learn(tip) {
   if (!currentKey) {
     alert(
       'O destino ainda não foi identificado. ' +
       'Use "Corrigir destino".'
     );
+
     return;
   }
 
@@ -1107,7 +1302,9 @@ async function learn(tip) {
       key: currentKey,
       name: currentExtracted.name || '',
       address: currentExtracted.address || '',
-      postcode: currentExtracted.postcode || '',
+      postcode: normalizePostcode(
+        currentExtracted.postcode || ''
+      ),
       tip: !!tip,
       date: new Date().toISOString()
     });
@@ -1116,8 +1313,12 @@ async function learn(tip) {
 
     const prediction = await predict(currentKey);
 
-    showPrediction(prediction, currentExtracted);
-    updateCount();
+    showPrediction(
+      prediction,
+      currentExtracted
+    );
+
+    await updateCount();
 
     alert('Resultado registrado com sucesso.');
   } catch (error) {
@@ -1136,7 +1337,9 @@ function openManual() {
     currentExtracted.address || '';
 
   $('manualPostcode').value =
-    currentExtracted.postcode || '';
+    currentExtracted.postcode
+      ? displayPostcode(currentExtracted.postcode)
+      : '';
 
   $('manualDialog').showModal();
 }
@@ -1151,10 +1354,14 @@ $('manualSave').onclick = async () => {
 
   const postcode =
     cleanPostcode(postcodeRaw) ||
-    postcodeRaw.toUpperCase().replace(/\s+/g, '');
+    postcodeRaw.toUpperCase()
+      .replace(/[^A-Z0-9]/g, '');
 
   if (!address && !postcode) {
-    alert('Digite o endereço ou o Eircode do cliente.');
+    alert(
+      'Digite o endereço ou o Eircode do cliente.'
+    );
+
     return;
   }
 
@@ -1172,12 +1379,15 @@ $('manualSave').onclick = async () => {
 
   const prediction = await predict(currentKey);
 
-  showPrediction(prediction, currentExtracted);
+  showPrediction(
+    prediction,
+    currentExtracted
+  );
 };
 
 
 /* =========================================================
-   OCR - PREPROCESSAMENTO
+   OCR — PREPROCESSAMENTO
 ========================================================= */
 
 async function preprocess(file, mode = 'full') {
@@ -1205,17 +1415,33 @@ async function preprocess(file, mode = 'full') {
     sh = Math.floor(bitmap.height * 0.60);
   }
 
-  canvas.width = Math.min(Math.floor(sw * scale), 3200);
-  canvas.height = Math.min(Math.floor(sh * scale), 4200);
+  canvas.width = Math.min(
+    Math.floor(sw * scale),
+    3200
+  );
+
+  canvas.height = Math.min(
+    Math.floor(sh * scale),
+    4200
+  );
 
   ctx.drawImage(
     bitmap,
-    sx, sy, sw, sh,
-    0, 0, canvas.width, canvas.height
+    sx,
+    sy,
+    sw,
+    sh,
+    0,
+    0,
+    canvas.width,
+    canvas.height
   );
 
   const image = ctx.getImageData(
-    0, 0, canvas.width, canvas.height
+    0,
+    0,
+    canvas.width,
+    canvas.height
   );
 
   for (let i = 0; i < image.data.length; i += 4) {
@@ -1223,17 +1449,27 @@ async function preprocess(file, mode = 'full') {
     const g = image.data[i + 1];
     const b = image.data[i + 2];
 
-    let v = 0.299 * r + 0.587 * g + 0.114 * b;
+    let value =
+      0.299 * r +
+      0.587 * g +
+      0.114 * b;
 
-    v = (v - 128) * 1.35 + 128;
-    v = Math.max(0, Math.min(255, v));
+    value = (value - 128) * 1.35 + 128;
+    value = Math.max(
+      0,
+      Math.min(255, value)
+    );
 
-    image.data[i] = v;
-    image.data[i + 1] = v;
-    image.data[i + 2] = v;
+    image.data[i] = value;
+    image.data[i + 1] = value;
+    image.data[i + 2] = value;
   }
 
   ctx.putImageData(image, 0, 0);
+
+  if (bitmap.close) {
+    bitmap.close();
+  }
 
   return canvas;
 }
@@ -1270,7 +1506,11 @@ async function ocrPass(image, label) {
 ========================================================= */
 
 async function processImage(file) {
-  if (!file || !file.type.startsWith('image/')) {
+  if (
+    !file ||
+    !file.type ||
+    !file.type.startsWith('image/')
+  ) {
     return;
   }
 
@@ -1295,7 +1535,8 @@ async function processImage(file) {
   imageUrl = URL.createObjectURL(file);
   img.src = imageUrl;
 
-  $('ocrStatus').textContent = 'Preparando OCR…';
+  $('ocrStatus').textContent =
+    'Preparando OCR…';
 
   try {
     const full = await preprocess(file, 'full');
@@ -1304,9 +1545,17 @@ async function processImage(file) {
 
     const texts = [];
 
-    texts.push(await ocrPass(full, '(1/3)'));
-    texts.push(await ocrPass(middle, '(2/3)'));
-    texts.push(await ocrPass(lower, '(3/3)'));
+    texts.push(
+      await ocrPass(full, '(1/3)')
+    );
+
+    texts.push(
+      await ocrPass(middle, '(2/3)')
+    );
+
+    texts.push(
+      await ocrPass(lower, '(3/3)')
+    );
 
     const text = texts.join('\n');
 
@@ -1323,14 +1572,10 @@ async function processImage(file) {
 
     const prediction = await predict(currentKey);
 
-    showPrediction(prediction, currentExtracted);
-
-    /*
-      IMPORTANTE:
-      O registro da tip NÃO é aberto automaticamente.
-      A entrega deve ser feita primeiro.
-    */
-
+    showPrediction(
+      prediction,
+      currentExtracted
+    );
   } catch (error) {
     console.error(error);
 
@@ -1341,8 +1586,8 @@ async function processImage(file) {
     $('prediction').innerHTML = `
       <div class="status no">
         Ocorreu um erro durante a leitura do print.
-        Você pode tentar novamente ou corrigir o destino
-        manualmente.
+        Você pode tentar novamente ou corrigir
+        o destino manualmente.
       </div>
     `;
 
@@ -1382,7 +1627,11 @@ const drop = $('drop');
 drop.addEventListener('drop', event => {
   const file = event.dataTransfer.files[0];
 
-  if (file && file.type.startsWith('image/')) {
+  if (
+    file &&
+    file.type &&
+    file.type.startsWith('image/')
+  ) {
     processImage(file);
   }
 });
@@ -1437,7 +1686,7 @@ async function updateCount() {
 
 
 /* =========================================================
-   BANCO - RENDERIZAÇÃO
+   BANCO — RENDERIZAÇÃO
 ========================================================= */
 
 async function renderDb() {
@@ -1445,7 +1694,9 @@ async function renderDb() {
   const el = $('dbList');
 
   if (!records.length) {
-    el.innerHTML = '<p class="empty">Banco vazio.</p>';
+    el.innerHTML =
+      '<p class="empty">Banco vazio.</p>';
+
     return;
   }
 
@@ -1459,20 +1710,27 @@ async function renderDb() {
             <th>Data</th>
           </tr>
         </thead>
+
         <tbody>
           ${records.slice().reverse().map(record => {
             const address = escapeHTML(
-              record.address || record.postcode || '—'
+              record.address ||
+              record.postcode ||
+              '—'
             );
 
             const postcode = escapeHTML(
               record.postcode || ''
             );
 
-            const tip = record.tip ? 'SIM' : 'NÃO';
+            const tip = record.tip
+              ? 'SIM'
+              : 'NÃO';
 
             const date = record.date
-              ? new Date(record.date).toLocaleDateString('pt-BR')
+              ? new Date(
+                  record.date
+                ).toLocaleDateString('pt-BR')
               : '—';
 
             return `
@@ -1481,7 +1739,9 @@ async function renderDb() {
                   ${address}
                   ${
                     postcode
-                      ? `<br><span class="small muted">${postcode}</span>`
+                      ? `<br><span class="small muted">${
+                          displayPostcode(postcode)
+                        }</span>`
                       : ''
                   }
                 </td>
@@ -1507,7 +1767,9 @@ $('dbBtn').onclick = async () => {
     $('dbDialog').showModal();
   } catch (error) {
     console.error(error);
-    alert('Não foi possível abrir o banco de dados.');
+    alert(
+      'Não foi possível abrir o banco de dados.'
+    );
   }
 };
 
@@ -1525,8 +1787,16 @@ $('exportBtn').onclick = async () => {
     const records = await allRecords();
 
     const blob = new Blob(
-      [JSON.stringify(records, null, 2)],
-      { type: 'application/json' }
+      [
+        JSON.stringify(
+          records,
+          null,
+          2
+        )
+      ],
+      {
+        type: 'application/json'
+      }
     );
 
     const url = URL.createObjectURL(blob);
@@ -1539,10 +1809,11 @@ $('exportBtn').onclick = async () => {
     setTimeout(() => {
       URL.revokeObjectURL(url);
     }, 1000);
-
   } catch (error) {
     console.error(error);
-    alert('Não foi possível exportar o backup.');
+    alert(
+      'Não foi possível exportar o backup.'
+    );
   }
 };
 
@@ -1559,9 +1830,13 @@ $('importFile').onchange = async event => {
   try {
     const file = event.target.files[0];
 
-    if (!file) return;
+    if (!file) {
+      return;
+    }
 
-    const records = JSON.parse(await file.text());
+    const records = JSON.parse(
+      await file.text()
+    );
 
     if (!Array.isArray(records)) {
       throw new Error('Backup inválido');
@@ -1570,20 +1845,26 @@ $('importFile').onchange = async event => {
     await clearRecords();
 
     for (const record of records) {
-      const copy = { ...record };
+      const copy = {
+        ...record
+      };
+
       delete copy.id;
+
       await addRecord(copy);
     }
 
     await renderDb();
     await updateCount();
 
-    alert('Backup importado com sucesso.');
-
+    alert(
+      'Backup importado com sucesso.'
+    );
   } catch (error) {
     console.error(error);
-    alert('Não foi possível importar este backup.');
-
+    alert(
+      'Não foi possível importar este backup.'
+    );
   } finally {
     event.target.value = '';
   }
@@ -1607,7 +1888,9 @@ $('clearBtn').onclick = async () => {
     alert('Banco apagado.');
   } catch (error) {
     console.error(error);
-    alert('Não foi possível apagar o banco.');
+    alert(
+      'Não foi possível apagar o banco.'
+    );
   }
 };
 
@@ -1618,7 +1901,12 @@ $('clearBtn').onclick = async () => {
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js')
-    .catch(console.error);
+    .catch(error => {
+      console.error(
+        'Service Worker não registrado:',
+        error
+      );
+    });
 }
 
 
@@ -1627,7 +1915,6 @@ if ('serviceWorker' in navigator) {
 ========================================================= */
 
 updateCount();
-
 </script>
 
 </body>
