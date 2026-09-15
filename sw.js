@@ -1,40 +1,32 @@
-const CACHE_NAME = 'tip-check-v3';
 
-const APP_SHELL = [
-  './',
-  './index.html',
-  './manifest.webmanifest',
-  './icon-180.png',
-  './icon-192.png',
-  './icon-512.png',
-  './install.html',
-  './version.txt'
-];
+const CACHE_NAME = 'tip-check-v5';
 
 self.addEventListener('install', event => {
+  self.skipWaiting();
+
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(APP_SHELL))
-      .then(() => self.skipWaiting())
+    caches.open(CACHE_NAME).then(cache => {
+      return cache.add('./index.html').catch(() => {});
+    })
   );
 });
 
 self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys()
-      .then(keys =>
-        Promise.all(
-          keys
-            .filter(key => key !== CACHE_NAME)
-            .map(key => caches.delete(key))
-        )
-      )
-      .then(() => self.clients.claim())
+    caches.keys().then(keys => {
+      return Promise.all(
+        keys
+          .filter(key => key !== CACHE_NAME)
+          .map(key => caches.delete(key))
+      );
+    }).then(() => self.clients.claim())
   );
 });
 
 self.addEventListener('fetch', event => {
-  if (event.request.method !== 'GET') return;
+  if (event.request.method !== 'GET') {
+    return;
+  }
 
   event.respondWith(
     fetch(event.request)
@@ -47,10 +39,6 @@ self.addEventListener('fetch', event => {
 
         return response;
       })
-      .catch(() =>
-        caches.match(event.request).then(
-          cached => cached || caches.match('./index.html')
-        )
-      )
+      .catch(() => caches.match(event.request))
   );
 });
